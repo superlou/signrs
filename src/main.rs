@@ -8,7 +8,8 @@ use speedy2d::shape::Rectangle;
 use speedy2d::window::{WindowHandler, WindowHelper};
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
-use speedy2d::font::Font;
+use speedy2d::font::{Font, TextLayout, TextOptions, FormattedTextBlock};
+use speedy2d::dimen::Vec2;
 use rhai::{Engine, Scope, AST, Array, CallFnOptions};
 
 struct SignWindowHandler {
@@ -23,6 +24,7 @@ struct SignWindowHandler {
 enum GraphicsCalls {
     ClearScreen(Color),
     DrawRectangle(Rectangle, Color),
+    DrawText(Vec2, Color, Rc<FormattedTextBlock>),
 }
 
 impl WindowHandler for SignWindowHandler {
@@ -40,6 +42,7 @@ impl WindowHandler for SignWindowHandler {
             match call {
                 GraphicsCalls::ClearScreen(c) => graphics.clear_screen(*c),
                 GraphicsCalls::DrawRectangle(r, c) => graphics.draw_rectangle(r.clone(), *c),
+                GraphicsCalls::DrawText(pos, c, block) => graphics.draw_text(pos, *c, block),
             }
         }
         self.graphics_calls.borrow_mut().clear();
@@ -50,18 +53,22 @@ impl WindowHandler for SignWindowHandler {
 
 impl SignWindowHandler {
     fn setup_engine(&mut self) {
-        let graphics_calls = self.graphics_calls.clone();
-        
+        let graphics_calls = self.graphics_calls.clone();       
         self.engine.register_fn("clear_screen", move |c: Color| {
            graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreen(c));
         });
         
         let graphics_calls = self.graphics_calls.clone();        
-        
         self.engine.register_fn("draw_rectangle", move |ulx: f32, uly: f32, llx: f32, lly: f32, c: Color| {
            let r = Rectangle::from_tuples((ulx, uly), (llx, lly));         
            graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c));
-        });    
+        });
+        
+        let graphics_calls = self.graphics_calls.clone();        
+        self.engine.register_fn("draw_text", move |text: &str, font: Font, scale: f32, color: Color, x: f32, y: f32| {
+            let block = font.layout_text(text, scale, TextOptions::new());
+            graphics_calls.borrow_mut().push(GraphicsCalls::DrawText((x, y).into(), color, block));
+        });
     
         self.engine.register_type_with_name::<Color>("Color")
             .register_fn("new_color_from_rgb", Color::from_rgb);
