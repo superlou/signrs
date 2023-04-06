@@ -1,9 +1,10 @@
-let resolution = [640, ];
+let resolution = [640, 480];
 
 let color_bg = new_color_from_rgb(0.0, 0.0, 0.0);
 let color_green = new_color_from_rgba(0.0, 0.8, 0.1, 0.8);
 let color_blue = new_color_from_rgba(0.1, 0.1, 0.8, 0.8);
 
+let font = new_font("assets/Roboto-Regular.ttf");
 let t = 0;
 
 fn draw(dt) { 

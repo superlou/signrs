@@ -1,13 +1,15 @@
 use std::time::Instant;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::path::{Path, PathBuf};
 
 use speedy2d::Window;
 use speedy2d::shape::Rectangle;
 use speedy2d::window::{WindowHandler, WindowHelper};
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
-use rhai::{Engine, Scope, AST, Array};
+use speedy2d::font::Font;
+use rhai::{Engine, Scope, AST, Array, CallFnOptions};
 
 struct SignWindowHandler {
     engine: Engine,
@@ -15,6 +17,7 @@ struct SignWindowHandler {
     scope: Scope<'static>,
     last_frame_time: Instant,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
+    root_path: Rc<RefCell<PathBuf>>,
 }
 
 enum GraphicsCalls {
@@ -27,7 +30,8 @@ impl WindowHandler for SignWindowHandler {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
       
-        let result = self.engine.call_fn::<()>(&mut self.scope, &mut self.ast, "draw", (dt,));
+        let options = CallFnOptions::new().eval_ast(false);
+        let result = self.engine.call_fn_with_options::<()>(options, &mut self.scope, &mut self.ast, "draw", (dt,));
         if let Err(err) = result {
             dbg!(&err);
         }
@@ -63,7 +67,20 @@ impl SignWindowHandler {
             .register_fn("new_color_from_rgb", Color::from_rgb);
 
         self.engine.register_type_with_name::<Color>("Color")
-            .register_fn("new_color_from_rgba", Color::from_rgba);        
+            .register_fn("new_color_from_rgba", Color::from_rgba);
+        
+        let root_path = self.root_path.clone();
+        
+        self.engine.register_type_with_name::<Font>("Font")
+            .register_fn("new_font", move |font_path: &str| {
+                let mut full_path = root_path.borrow_mut();
+                full_path.push(font_path);
+                dbg!(&full_path);
+                
+                let bytes = std::fs::read(full_path.as_path()).unwrap();
+                let font = Font::new(&bytes).unwrap();
+                font
+        });
                         
         let result = self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast);
         if let Err(err) = result {
@@ -86,14 +103,20 @@ impl SignWindowHandler {
 
 fn main() {
     println!("Starting...");
+    let sign_root = Path::new("examples/display1");
     let engine = Engine::new();   
-    let ast = engine.compile_file("examples/display1/main.rhai".into()).unwrap();
+    
+    let mut main_script = sign_root.to_path_buf();
+    main_script.push("main.rhai");
+
+    let ast = engine.compile_file(main_script).unwrap();
     let scope = Scope::new();
           
     let mut handler = SignWindowHandler {
         engine, ast, scope,
         last_frame_time: Instant::now(),
         graphics_calls: Rc::new(RefCell::new(vec![])),
+        root_path: Rc::new(RefCell::new(sign_root.to_path_buf())),
     };
     
     handler.setup_engine();
