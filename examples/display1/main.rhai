@@ -1,3 +1,5 @@
+let resolution = [640, ];
+
 let color_bg = new_color_from_rgb(0.0, 0.0, 0.0);
 let color_green = new_color_from_rgba(0.0, 0.8, 0.1, 0.8);
 let color_blue = new_color_from_rgba(0.1, 0.1, 0.8, 0.8);
@@ -5,7 +7,6 @@ let color_blue = new_color_from_rgba(0.1, 0.1, 0.8, 0.8);
 let t = 0;
 
 fn draw(dt) { 
-    print(dt);
     t += dt;
     clear_screen(color_bg);
     draw_rectangle(

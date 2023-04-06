@@ -7,7 +7,7 @@ use speedy2d::shape::Rectangle;
 use speedy2d::window::{WindowHandler, WindowHelper};
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
-use rhai::{Engine, Scope, AST};
+use rhai::{Engine, Scope, AST, Array};
 
 struct SignWindowHandler {
     engine: Engine,
@@ -42,10 +42,6 @@ impl WindowHandler for SignWindowHandler {
         
         helper.request_redraw();
     }
-    
-    fn on_start(&mut self, _helper: &mut WindowHelper<()>, _info: speedy2d::window::WindowStartupInfo) {
-        self.setup_engine();
-    }
 }
 
 impl SignWindowHandler {
@@ -74,6 +70,18 @@ impl SignWindowHandler {
             dbg!(&err);
         }               
     }
+    
+    fn get_resolution(&self) -> Option<(u32, u32)> {       
+        match self.scope.get_value::<Array>("resolution") {
+            Some(a) => {
+                match (a[0].clone().try_cast::<i64>(), a[1].clone().try_cast::<i64>()) {
+                    (Some(x), Some(y)) => Some((x as u32, y as u32)),
+                    _ => None,
+                }
+            },
+            None => None
+        }
+    }
 }
 
 fn main() {
@@ -81,14 +89,16 @@ fn main() {
     let engine = Engine::new();   
     let ast = engine.compile_file("examples/display1/main.rhai".into()).unwrap();
     let scope = Scope::new();
-    
-    let window = Window::new_centered("Title", (640, 480)).unwrap();
-        
-    let handler = SignWindowHandler {
+          
+    let mut handler = SignWindowHandler {
         engine, ast, scope,
         last_frame_time: Instant::now(),
         graphics_calls: Rc::new(RefCell::new(vec![])),
     };
-
+    
+    handler.setup_engine();
+    let resolution = handler.get_resolution().expect("Script didn't set resolution!");
+    
+    let window = Window::new_centered("Title", resolution).unwrap();    
     window.run_loop(handler);
 }
