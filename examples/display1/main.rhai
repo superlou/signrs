@@ -6,6 +6,7 @@ let color_blue = new_color_from_rgba(0.1, 0.1, 0.8, 0.8);
 let color_white = new_color_from_rgb(1.0, 1.0, 1.0);
 
 let font = new_font("assets/Roboto-Regular.ttf");
+let image = new_image("assets/background.jpg");
 let t = 0;
 
 let fps = 0;
@@ -13,6 +14,9 @@ let fps = 0;
 fn draw(dt) { 
     t += dt;
     clear_screen(color_bg);
+    
+    draw_image(image, 0.0, 0.0, 640., 480.);    
+    
     draw_rectangle(
         40.0 + 50 * cos(t), 40.0 + 20 * sin(2*t),
         100.0, 100.0, color_green
