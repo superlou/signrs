@@ -43,47 +43,17 @@ impl WindowHandler for SignWindowHandler {
             dbg!(&err);
         }
 
-        for call in self.graphics_calls.borrow().iter() {
+        for call in self.graphics_calls.clone().borrow().iter() {
             match call {
                 GraphicsCalls::ClearScreen(c) => graphics.clear_screen(*c),
                 GraphicsCalls::DrawRectangle(r, c) => graphics.draw_rectangle(r.clone(), *c),
                 GraphicsCalls::DrawText(pos, c, block) => graphics.draw_text(pos, *c, block),
                 GraphicsCalls::DrawImage(pos, path_string) => {
-                    let mut created = false;
-                    let image_handle = match self.image_handles.borrow_mut().get_mut(path_string) {
-                        Some(image_handle) => image_handle.clone(),
-                        None => {
-                            let mut path = self.root_path.borrow().clone();
-                            path.push(path_string);
-                            let image_handle = graphics.create_image_from_file_path(None, ImageSmoothingMode::Linear, path).unwrap();
-                            created = true;
-                            image_handle
-                        }
-                    };
-                    
-                    if created {
-                        self.image_handles.borrow_mut().insert(path_string.to_owned(), image_handle.clone());
-                    }
-                    
+                    let image_handle = self.get_image_handle(path_string, graphics);
                     graphics.draw_image(pos, &image_handle);
                 },
                 GraphicsCalls::DrawRectangleImage(r, path_string) => {
-                    let mut created = false;
-                    let image_handle = match self.image_handles.borrow_mut().get_mut(path_string) {
-                        Some(image_handle) => image_handle.clone(),
-                        None => {
-                            let mut path = self.root_path.borrow().clone();
-                            path.push(path_string);
-                            let image_handle = graphics.create_image_from_file_path(None, ImageSmoothingMode::Linear, path).unwrap();
-                            created = true;
-                            image_handle
-                        }
-                    };
-                    
-                    if created {
-                        self.image_handles.borrow_mut().insert(path_string.to_owned(), image_handle.clone());
-                    }
-                    
+                    let image_handle = self.get_image_handle(path_string, graphics);
                     graphics.draw_rectangle_image(r.clone(), &image_handle);                    
                 },
             }
@@ -164,6 +134,26 @@ impl SignWindowHandler {
             },
             None => None
         }
+    }
+    
+    fn get_image_handle(&mut self, path_string: &str, graphics: &mut Graphics2D) -> ImageHandle {
+        let mut created = false;
+        let image_handle = match self.image_handles.borrow_mut().get_mut(path_string) {
+            Some(image_handle) => image_handle.clone(),
+            None => {
+                let mut path = self.root_path.borrow().clone();
+                path.push(path_string);
+                let image_handle = graphics.create_image_from_file_path(None, ImageSmoothingMode::Linear, path).unwrap();
+                created = true;
+                image_handle
+            }
+        };
+                    
+        if created {
+            self.image_handles.borrow_mut().insert(path_string.to_owned(), image_handle.clone());
+        }
+        
+        image_handle
     }
 }
 
