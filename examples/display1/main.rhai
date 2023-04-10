@@ -7,6 +7,7 @@ let color_white = new_color_from_rgb(1.0, 1.0, 1.0);
 
 let font = new_font("assets/Roboto-Regular.ttf");
 let image = new_image("assets/background.jpg");
+let seahorse = new_image("assets/seahorse.png");
 let t = 0;
 
 let fps = 0;
@@ -32,4 +33,6 @@ fn draw(dt) {
     
     fps = 0.9 * fps + 0.1 * (1 / dt);
     draw_text(fps.to_string(), font, 18., color_white, 500., 10.);
+    
+    draw_image(seahorse, 400., 150., 207., 212., 0.5 + 0.5 * sin(2 * t));
 }

@@ -29,7 +29,7 @@ enum GraphicsCalls {
     DrawRectangle(Rectangle, Color),
     DrawText(Vec2, Color, Rc<FormattedTextBlock>),
     DrawImage(Vec2, String),
-    DrawRectangleImage(Rectangle, String),
+    DrawRectangleImageTinted(Rectangle, String, Color),
 }
 
 impl WindowHandler for SignWindowHandler {
@@ -52,9 +52,9 @@ impl WindowHandler for SignWindowHandler {
                     let image_handle = self.get_image_handle(path_string, graphics);
                     graphics.draw_image(pos, &image_handle);
                 },
-                GraphicsCalls::DrawRectangleImage(r, path_string) => {
+                GraphicsCalls::DrawRectangleImageTinted(r, path_string, c) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
-                    graphics.draw_rectangle_image(r.clone(), &image_handle);                    
+                    graphics.draw_rectangle_image_tinted(r.clone(), *c, &image_handle);
                 },
             }
         }
@@ -112,11 +112,21 @@ impl SignWindowHandler {
 
         let graphics_calls = self.graphics_calls.clone();
         self.engine.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32| {
-            graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangleImage(
+            graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangleImageTinted(
                 Rectangle::new((x, y).into(), (x + w, y + h).into()),
-                path_string.to_owned()
+                path_string.to_owned(),
+                Color::WHITE,
             ));
         });
+        
+        let graphics_calls = self.graphics_calls.clone();
+        self.engine.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32, alpha: f32| {
+            graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangleImageTinted(
+                Rectangle::new((x, y).into(), (x + w, y + h).into()),
+                path_string.to_owned(),
+                Color::from_rgba(1.0, 1.0, 1.0, alpha),
+            ));
+        });        
         
         let result = self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast);
         if let Err(err) = result {
