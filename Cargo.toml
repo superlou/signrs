@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 speedy2d = "1.12"
 rhai = {version = "1.13", features = ["f32_float"]}
+notify = "5.1.0"

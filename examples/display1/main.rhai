@@ -12,7 +12,12 @@ let t = 0;
 
 let fps = 0;
 
-fn draw(dt) { 
+let data = #{};
+watch_json("text.json", |new_data| {
+    data = new_data;
+});
+
+fn draw(dt) {
     t += dt;
     clear_screen(color_bg);
     
@@ -35,4 +40,5 @@ fn draw(dt) {
     draw_text(fps.to_string(), font, 18., color_white, 500., 10.);
     
     draw_image(seahorse, 400., 150., 207., 212., 0.5 + 0.5 * sin(2 * t));
+    print(data);
 }
