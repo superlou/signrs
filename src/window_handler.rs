@@ -218,6 +218,13 @@ impl SignWindowHandler {
         }
     }
     
+    pub fn get_multisampling(&self) -> Option<u16> {
+        match self.scope.get_value::<i64>("multisampling") {
+            Some(m) => u16::try_from(m).ok(),
+            None => None,
+        }
+    }
+    
     fn get_image_handle(&mut self, path_string: &str, graphics: &mut Graphics2D) -> ImageHandle {
         let mut created = false;
         let image_handle = match self.image_handles.borrow_mut().get_mut(path_string) {
