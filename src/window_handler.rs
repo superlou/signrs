@@ -48,10 +48,18 @@ impl WindowHandler for SignWindowHandler {
       
         // Check for changed files       
         for changed_path_buf in self.file_change_rx.try_iter() {
+            // Check if it's a watched file
             if let Some(fn_ptr) = self.watches.borrow().get(&changed_path_buf) {
                 let json_text = read_to_string(&changed_path_buf).unwrap();
                 let json_data = self.engine.parse_json(json_text, true).unwrap();
                 fn_ptr.call::<()>(&self.engine, &self.ast, (json_data,)).unwrap();
+            }
+            
+            // If it's a Rhai script, update the AST and run it
+            if changed_path_buf.extension().unwrap().eq_ignore_ascii_case("rhai") {
+                let new_ast = self.engine.compile_file_with_scope(&mut self.scope, changed_path_buf).unwrap();
+                self.ast = self.ast.merge(&new_ast);
+                let _= self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast);
             }
         }
 
