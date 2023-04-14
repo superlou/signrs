@@ -17,6 +17,8 @@ use speedy2d::color::Color;
 use speedy2d::font::{Font, TextLayout, TextOptions, FormattedTextBlock};
 use speedy2d::dimen::Vec2;
 
+use crate::iter_util::iter_unique;
+
 pub struct SignWindowHandler {
     engine: Engine,
     ast: AST,
@@ -47,7 +49,7 @@ impl WindowHandler for SignWindowHandler {
         self.last_frame_time = Instant::now();
       
         // Check for changed files       
-        for changed_path_buf in self.file_change_rx.try_iter() {
+        for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
             // Check if it's a watched file
             if let Some(fn_ptr) = self.watches.borrow().get(&changed_path_buf) {
                 let json_text = read_to_string(&changed_path_buf).unwrap();

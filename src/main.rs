@@ -1,6 +1,7 @@
 use speedy2d::Window;
 use speedy2d::window::{WindowCreationOptions, WindowSize};
 
+mod iter_util;
 mod window_handler;
 use window_handler::SignWindowHandler;
 
