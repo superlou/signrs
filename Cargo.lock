@@ -1285,6 +1285,7 @@ dependencies = [
  "notify",
  "rhai",
  "speedy2d",
+ "thiserror",
 ]
 
 [[package]]

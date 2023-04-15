@@ -17,7 +17,7 @@ fn main() {
     let options = WindowCreationOptions::new_windowed(WindowSize::PhysicalPixels(resolution.into()), None)
                     .with_multisampling(multisampling);
     
-    let window = Window::new_with_options("Title", options).unwrap();
+    let window = Window::new_with_options("Title", options).expect("Failed to create window!");
 
     window.run_loop(handler);
 }

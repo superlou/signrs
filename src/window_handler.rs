@@ -8,7 +8,7 @@ use std::sync::mpsc;
 use std::fs::read_to_string;
 
 use notify::{Watcher, RecursiveMode};
-use rhai::{Engine, Scope, AST, Array, CallFnOptions, FnPtr};
+use rhai::{Engine, Scope, AST, Array, CallFnOptions, FnPtr, EvalAltResult};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
 use speedy2d::window::{WindowHandler, WindowHelper};
@@ -16,8 +16,15 @@ use speedy2d::Graphics2D;
 use speedy2d::color::Color;
 use speedy2d::font::{Font, TextLayout, TextOptions, FormattedTextBlock};
 use speedy2d::dimen::Vec2;
+use thiserror::Error;
 
 use crate::iter_util::iter_unique;
+
+#[derive(Error, Debug)]
+enum SignError {
+    #[error("EvalAltError: {0}")]
+    EvalAltError(#[from] Box<EvalAltResult>),
+}
 
 pub struct SignWindowHandler {
     engine: Engine,
@@ -48,8 +55,12 @@ impl WindowHandler for SignWindowHandler {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
       
-        // Check for changed files       
-        for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
+        // Check for changed files
+        // todo Try http://smallcultfollowing.com/babysteps/blog/2018/11/01/after-nll-interprocedural-conflicts/
+        // instead of cloning.
+        let changed = iter_unique(self.file_change_rx.try_iter().collect::<Vec<PathBuf>>());
+        
+        for changed_path_buf in changed {
             // Check if it's a watched file
             if let Some(fn_ptr) = self.watches.borrow().get(&changed_path_buf) {
                 let json_text = read_to_string(&changed_path_buf).unwrap();
@@ -57,11 +68,15 @@ impl WindowHandler for SignWindowHandler {
                 fn_ptr.call::<()>(&self.engine, &self.ast, (json_data,)).unwrap();
             }
             
-            // If it's a Rhai script, update the AST and run it
-            if changed_path_buf.extension().unwrap().eq_ignore_ascii_case("rhai") {
-                let new_ast = self.engine.compile_file_with_scope(&mut self.scope, changed_path_buf).unwrap();
-                self.ast = self.ast.merge(&new_ast);
-                let _= self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast);
+            let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());
+            
+            match extension {
+                Some(ext) if ext == "rhai" => {
+                    if let Err(error) = self.hotload_rhai(&changed_path_buf) {
+                        println!("{}", error);
+                    }
+                },
+                _ => {},
             }
         }
 
@@ -95,6 +110,13 @@ impl WindowHandler for SignWindowHandler {
 }
 
 impl SignWindowHandler {
+    fn hotload_rhai(&mut self, path: &Path) -> Result<(), SignError> {
+        let new_ast = self.engine.compile_file_with_scope(&self.scope, path.to_owned())?;
+        self.ast.combine(new_ast);
+        self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast)?;
+        Ok(())
+    }
+    
     pub fn new<P: AsRef<Path>>(sign_root: P) -> Self {
         let engine = Engine::new();   
         
