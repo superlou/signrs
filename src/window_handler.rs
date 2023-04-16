@@ -5,10 +5,9 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::sync::mpsc;
-use std::fs::read_to_string;
 
 use notify::{Watcher, RecursiveMode};
-use rhai::{Engine, Scope, AST, Array, CallFnOptions, FnPtr, EvalAltResult};
+use rhai::{Array, FnPtr};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
 use speedy2d::window::{WindowHandler, WindowHelper};
@@ -19,17 +18,16 @@ use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
 use crate::iter_util::iter_unique;
+use crate::script_env::{ScriptEnv, ScriptError};
 
 #[derive(Error, Debug)]
 enum SignError {
     #[error("EvalAltError: {0}")]
-    EvalAltError(#[from] Box<EvalAltResult>),
+    EvalAltError(#[from] ScriptError),
 }
 
 pub struct SignWindowHandler {
-    engine: Engine,
-    ast: AST,
-    scope: Scope<'static>,
+    script_env: ScriptEnv,
     last_frame_time: Instant,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
     root_path: Rc<RefCell<PathBuf>>,
@@ -54,25 +52,22 @@ impl WindowHandler for SignWindowHandler {
     fn on_draw(&mut self, helper: &mut WindowHelper, graphics: &mut Graphics2D) {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
-      
-        // Check for changed files
-        // todo Try http://smallcultfollowing.com/babysteps/blog/2018/11/01/after-nll-interprocedural-conflicts/
-        // instead of cloning.
-        let changed = iter_unique(self.file_change_rx.try_iter().collect::<Vec<PathBuf>>());
         
-        for changed_path_buf in changed {
-            // Check if it's a watched file
+        for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
+            // Check if it's a watched file with a callback
             if let Some(fn_ptr) = self.watches.borrow().get(&changed_path_buf) {
-                let json_text = read_to_string(&changed_path_buf).unwrap();
-                let json_data = self.engine.parse_json(json_text, true).unwrap();
-                fn_ptr.call::<()>(&self.engine, &self.ast, (json_data,)).unwrap();
+                match self.script_env.parse_json_file(&changed_path_buf) {
+                    Ok(json_data) => self.script_env.call_fn_ptr::<()>(fn_ptr, (json_data,)).unwrap(),
+                    Err(e) => println!("{}", e),
+                };
             }
             
+            // If not explicitly watched, do other updates
             let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());
             
             match extension {
                 Some(ext) if ext == "rhai" => {
-                    if let Err(error) = self.hotload_rhai(&changed_path_buf) {
+                    if let Err(error) = self.script_env.hotload_rhai(&changed_path_buf) {
                         println!("{}", error);
                     }
                 },
@@ -81,9 +76,7 @@ impl WindowHandler for SignWindowHandler {
         }
 
         // Call script draw function
-        let options = CallFnOptions::new().eval_ast(false);
-        let result = self.engine.call_fn_with_options::<()>(options, &mut self.scope, &mut self.ast, "draw", (dt,));
-        if let Err(err) = result {
+        if let Err(err) = self.script_env.call_fn::<()>("draw", (dt,)) {
             dbg!(&err);
         }
 
@@ -109,20 +102,10 @@ impl WindowHandler for SignWindowHandler {
     }
 }
 
-impl SignWindowHandler {
-    fn hotload_rhai(&mut self, path: &Path) -> Result<(), SignError> {
-        let new_ast = self.engine.compile_file_with_scope(&self.scope, path.to_owned())?;
-        self.ast.combine(new_ast);
-        self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast)?;
-        Ok(())
-    }
-    
-    pub fn new<P: AsRef<Path>>(sign_root: P) -> Self {
-        let engine = Engine::new();   
-        
+impl SignWindowHandler {    
+    pub fn new<P: AsRef<Path>>(sign_root: P) -> Self {       
         let mut main_script = PathBuf::from(sign_root.as_ref());
         main_script.push("main.rhai");
-        let ast = engine.compile_file(main_script).unwrap();
         
         let (tx, rx) = mpsc::channel();
         let tx_for_engine = tx.clone();
@@ -142,10 +125,9 @@ impl SignWindowHandler {
         }).unwrap();
          
         watcher.watch(sign_root.as_ref(), RecursiveMode::Recursive).unwrap();
-
+       
         let mut handler = SignWindowHandler {
-            engine, ast,
-            scope: Scope::new(),
+            script_env: ScriptEnv::new(&main_script),
             last_frame_time: Instant::now(),
             graphics_calls: Rc::new(RefCell::new(vec![])),
             root_path: Rc::new(RefCell::new(sign_root.as_ref().to_path_buf())),
@@ -161,30 +143,31 @@ impl SignWindowHandler {
 
     fn setup_engine(&mut self, file_changed_tx: mpsc::Sender<PathBuf>) {
         let graphics_calls = self.graphics_calls.clone();       
-        self.engine.register_fn("clear_screen", move |c: Color| {
-           graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreen(c));
+
+        self.script_env.register_fn("clear_screen", move |c: Color| {
+            graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreen(c));
         });
         
         let graphics_calls = self.graphics_calls.clone();        
-        self.engine.register_fn("draw_rectangle", move |ulx: f32, uly: f32, llx: f32, lly: f32, c: Color| {
+        self.script_env.register_fn("draw_rectangle", move |ulx: f32, uly: f32, llx: f32, lly: f32, c: Color| {
            let r = Rectangle::from_tuples((ulx, uly), (llx, lly));         
            graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c));
         });
         
         let graphics_calls = self.graphics_calls.clone();
-        self.engine.register_fn("draw_text", move |text: &str, font: Font, scale: f32, color: Color, x: f32, y: f32| {
+        self.script_env.register_fn("draw_text", move |text: &str, font: Font, scale: f32, color: Color, x: f32, y: f32| {
             let block = font.layout_text(text, scale, TextOptions::new());
             graphics_calls.borrow_mut().push(GraphicsCalls::DrawText((x, y).into(), color, block));
         });
     
-        self.engine.register_type_with_name::<Color>("Color")
+        self.script_env.register_type::<Color>("Color")
             .register_fn("new_color_from_rgb", Color::from_rgb);
 
-        self.engine.register_type_with_name::<Color>("Color")
+        self.script_env.register_type::<Color>("Color")
             .register_fn("new_color_from_rgba", Color::from_rgba);
         
         let root_path = self.root_path.clone();
-        self.engine.register_type_with_name::<Font>("Font")
+        self.script_env.register_type::<Font>("Font")
             .register_fn("new_font", move |font_path: &str| {
                 let mut full_path = root_path.borrow().clone();
                 full_path.push(font_path);
@@ -195,17 +178,17 @@ impl SignWindowHandler {
                 font
         });
        
-        self.engine.register_fn("new_image", move |path_string: &str| {
+        self.script_env.register_fn("new_image", move |path_string: &str| {
             path_string.to_owned()
         });
         
         let graphics_calls = self.graphics_calls.clone();
-        self.engine.register_fn("draw_image", move |path_string: &str, x: f32, y: f32| {
+        self.script_env.register_fn("draw_image", move |path_string: &str, x: f32, y: f32| {
             graphics_calls.borrow_mut().push(GraphicsCalls::DrawImage((x, y).into(), path_string.to_owned()));
         });
 
         let graphics_calls = self.graphics_calls.clone();
-        self.engine.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32| {
+        self.script_env.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32| {
             graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangleImageTinted(
                 Rectangle::new((x, y).into(), (x + w, y + h).into()),
                 path_string.to_owned(),
@@ -214,7 +197,7 @@ impl SignWindowHandler {
         });
         
         let graphics_calls = self.graphics_calls.clone();
-        self.engine.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32, alpha: f32| {
+        self.script_env.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32, alpha: f32| {
             graphics_calls.borrow_mut().push(GraphicsCalls::DrawRectangleImageTinted(
                 Rectangle::new((x, y).into(), (x + w, y + h).into()),
                 path_string.to_owned(),
@@ -224,7 +207,7 @@ impl SignWindowHandler {
         
         let root_path = self.root_path.clone();
         let watches = self.watches.clone();
-        self.engine.register_fn("watch_json", move |path_string: &str, fn_ptr: FnPtr| {
+        self.script_env.register_fn("watch_json", move |path_string: &str, fn_ptr: FnPtr| {
             let mut json_path = root_path.borrow().clone();
             json_path.push(path_string);
             let canonical_path = fs::canonicalize(json_path).unwrap();
@@ -232,14 +215,13 @@ impl SignWindowHandler {
             file_changed_tx.send(canonical_path).unwrap();
         });
         
-        let result = self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast);
-        if let Err(err) = result {
+        if let Err(err) = self.script_env.eval_initial() {
             dbg!(&err);
         }               
     }
     
     pub fn get_resolution(&self) -> Option<(u32, u32)> {       
-        match self.scope.get_value::<Array>("resolution") {
+        match self.script_env.get_value::<Array>("resolution") {
             Some(a) => {
                 match (a[0].clone().try_cast::<i64>(), a[1].clone().try_cast::<i64>()) {
                     (Some(x), Some(y)) => Some((x as u32, y as u32)),
@@ -251,7 +233,7 @@ impl SignWindowHandler {
     }
     
     pub fn get_multisampling(&self) -> Option<u16> {
-        match self.scope.get_value::<i64>("multisampling") {
+        match self.script_env.get_value::<i64>("multisampling") {
             Some(m) => u16::try_from(m).ok(),
             None => None,
         }

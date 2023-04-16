@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 speedy2d = "1.12"
-rhai = {version = "1.13", features = ["f32_float"]}
+rhai = {version = "1.13", features = ["f32_float", "internals"]}
 notify = "5.1.0"
 thiserror = "1.0"
