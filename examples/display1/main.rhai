@@ -41,4 +41,8 @@ fn draw(dt) {
     draw_text("FPS: " + str(fps, 1), font, 18., color_white, 500., 10.);
     
     draw_image(seahorse, 400., 150., 207., 212., 0.5 + 0.5 * sin(2 * t));
+    
+    for (text, i) in data.items {
+        draw_text(text, font, 18., color_white, 100., 300. + i * 20.);
+    }
 }
