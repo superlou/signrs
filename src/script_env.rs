@@ -32,7 +32,19 @@ impl ScriptEnv {
         }
     }
     
+    fn register_str_formatting(&mut self) {
+        self.engine.register_fn("str", |f: f32| {
+           format!("{0}", f)
+        });
+        
+        self.engine.register_fn("str", |f: f32, precision: i64| {
+           format!("{0:.1$}", f, precision as usize)
+        });
+    }
+    
     pub fn eval_initial(&mut self) -> Result<(), ScriptError> {
+        self.register_str_formatting();
+        
         match self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast) {
             Ok(_) => Ok(()),
             Err(e) => Err(ScriptError::EvalAltError(e))
