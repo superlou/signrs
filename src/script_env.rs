@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::fs::read_to_string;
 
+use chrono::DateTime;
 use rhai::{Engine, Scope, AST, CallFnOptions, FnPtr, EvalAltResult, FuncArgs, RegisterNativeFunction, Map};
 use thiserror::Error;
 use rhai::{Variant, Identifier};
@@ -40,10 +41,28 @@ impl ScriptEnv {
         self.engine.register_fn("str", |f: f32, precision: i64| {
            format!("{0:.1$}", f, precision as usize)
         });
+        
+        self.engine.register_fn("str", |dt: DateTime<chrono::Utc>| {
+            dt.format("%Y-%m-%d %H:%M:%S").to_string()
+        });
+        
+        self.engine.register_fn("str", |dt: DateTime<chrono::Utc>, fmt: &str, as_local: bool| {
+            if as_local {
+                dt.with_timezone(&chrono::Local).format(fmt).to_string()
+            } else {
+                dt.format(fmt).to_string()
+            }
+        });        
+    }
+    
+    fn register_datetime(&mut self) {
+        self.engine.register_type_with_name::<DateTime<chrono::Utc>>("DateTime")
+            .register_fn("now", || chrono::Utc::now());
     }
     
     pub fn eval_initial(&mut self) -> Result<(), ScriptError> {
         self.register_str_formatting();
+        self.register_datetime();
         
         match self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast) {
             Ok(_) => Ok(()),

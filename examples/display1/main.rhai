@@ -38,7 +38,8 @@ fn draw(dt) {
               100. + 50 * cos(10 * t), 100.);
     
     fps = 0.9 * fps + 0.1 * (1 / dt);
-    draw_text("FPS: " + str(fps, 1), font, 18., color_white, 500., 10.);
+    draw_text("FPS: " + str(fps, 1), font, 18., color_white, 400., 10.);
+    draw_text("Time: " + str(now(), "%-I:%M:%S %P", true), font, 18., color_white, 400., 30.);
     
     draw_image(seahorse, 400., 150., 207., 212., 0.5 + 0.5 * sin(2 * t));
     
