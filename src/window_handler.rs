@@ -137,11 +137,14 @@ impl SignWindowHandler {
             file_change_rx: rx,
         };
         
-        handler.setup_engine(tx_for_engine);
+        handler.register_fns_and_types(tx_for_engine);
+        if let Err(err) = handler.script_env.eval_initial() {
+            dbg!(&err);
+        }      
         handler
     }
 
-    fn setup_engine(&mut self, file_changed_tx: mpsc::Sender<PathBuf>) {
+    fn register_fns_and_types(&mut self, file_changed_tx: mpsc::Sender<PathBuf>) {
         let graphics_calls = self.graphics_calls.clone();       
 
         self.script_env.register_fn("clear_screen", move |c: Color| {
@@ -213,11 +216,7 @@ impl SignWindowHandler {
             let canonical_path = fs::canonicalize(json_path).unwrap();
             watches.borrow_mut().insert(canonical_path.clone(), fn_ptr.clone());
             file_changed_tx.send(canonical_path).unwrap();
-        });
-        
-        if let Err(err) = self.script_env.eval_initial() {
-            dbg!(&err);
-        }               
+        });         
     }
     
     pub fn get_resolution(&self) -> Option<(u32, u32)> {       
