@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::time::{Instant, Duration};
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -10,7 +10,7 @@ use notify::{Watcher, RecursiveMode};
 use rhai::{Array, FnPtr};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
-use speedy2d::window::{WindowHandler, WindowHelper};
+use speedy2d::window::{WindowHandler, WindowHelper, MouseButton, WindowFullscreenMode};
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
 use speedy2d::font::{Font, TextLayout, TextOptions, FormattedTextBlock};
@@ -29,6 +29,8 @@ enum SignError {
 pub struct SignWindowHandler {
     script_env: ScriptEnv,
     last_frame_time: Instant,
+    last_mouse_down_time: Option<Instant>,
+    is_fullscreen: bool,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
     root_path: Rc<RefCell<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
@@ -100,9 +102,34 @@ impl WindowHandler for SignWindowHandler {
         
         helper.request_redraw();
     }
+    
+    fn on_mouse_button_down(&mut self, helper: &mut WindowHelper<()>, _button: MouseButton) {
+        let double_click_timeout = Duration::from_millis(500);
+        let now = Instant::now();
+        
+        if let Some(prev_down) = self.last_mouse_down_time {
+            if now - prev_down < double_click_timeout {
+                self.toggle_fullscreen(helper);
+            }
+        }
+        
+        self.last_mouse_down_time = Some(now);
+    }
+    
+    fn on_fullscreen_status_changed(&mut self, _helper: &mut WindowHelper<()>, fullscreen: bool) {
+        self.is_fullscreen = fullscreen;
+    }
 }
 
-impl SignWindowHandler {    
+impl SignWindowHandler {
+    fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<()>) {
+        if self.is_fullscreen {
+            helper.set_fullscreen_mode(WindowFullscreenMode::Windowed);
+        } else {
+            helper.set_fullscreen_mode(WindowFullscreenMode::FullscreenBorderless);
+        }
+    }
+    
     pub fn new<P: AsRef<Path>>(sign_root: P) -> Self {       
         let mut main_script = PathBuf::from(sign_root.as_ref());
         main_script.push("main.rhai");
@@ -129,6 +156,8 @@ impl SignWindowHandler {
         let mut handler = SignWindowHandler {
             script_env: ScriptEnv::new(&main_script),
             last_frame_time: Instant::now(),
+            last_mouse_down_time: None,
+            is_fullscreen: false,
             graphics_calls: Rc::new(RefCell::new(vec![])),
             root_path: Rc::new(RefCell::new(sign_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
