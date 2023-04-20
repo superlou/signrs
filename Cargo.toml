@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-speedy2d = "1.12"
+speedy2d = {git = "https://github.com/superlou/Speedy2D.git"}
 rhai = {version = "1.13", features = ["f32_float", "internals"]}
 notify = "5.1.0"
 thiserror = "1.0"

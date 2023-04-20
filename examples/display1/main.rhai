@@ -1,4 +1,4 @@
-let resolution = [640, 480];
+let resolution = [960, 540];
 let multisampling = 1;
 
 let color_bg = new_color_from_rgb(0.0, 0.0, 0.0);
@@ -22,7 +22,7 @@ fn draw(dt) {
     t += dt;
     clear_screen(color_bg);
     
-    draw_image(image, 0.0, 0.0, 640., 480.);    
+    draw_image(image, 0.0, 0.0, 960., 540.);    
     
     draw_rectangle(
         40.0 + 50 * cos(t), 40.0 + 20 * sin(2*t),
@@ -38,8 +38,8 @@ fn draw(dt) {
               100. + 50 * cos(10 * t), 100.);
     
     fps = 0.9 * fps + 0.1 * (1 / dt);
-    draw_text("FPS: " + str(fps, 1), font, 18., color_white, 400., 10.);
-    draw_text("Time: " + str(now(), "%-I:%M:%S %P", true), font, 18., color_white, 400., 30.);
+    draw_text("FPS: " + str(fps, 1), font, 18., color_white, 800., 10.);
+    draw_text("Time: " + str(now(), "%-I:%M:%S %P", true), font, 18., color_white, 800., 30.);
     
     draw_image(seahorse, 400., 150., 207., 212., 0.5 + 0.5 * sin(2 * t));
     

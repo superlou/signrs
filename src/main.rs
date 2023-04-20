@@ -16,7 +16,7 @@ fn main() {
     println!("Multisampling: {}", multisampling);
 
     let options = WindowCreationOptions::new_windowed(WindowSize::PhysicalPixels(resolution.into()), None)
-                    .with_multisampling(multisampling);
+                    .with_multisampling(multisampling).with_stretch(true);
     
     let window = Window::new_with_options("Title", options).expect("Failed to create window!");
 

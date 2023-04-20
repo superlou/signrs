@@ -1451,8 +1451,7 @@ dependencies = [
 [[package]]
 name = "speedy2d"
 version = "1.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd2b8da73b17b0ec6efeef8586dbc7370c2fe7ab2af0a0973b6699fe6f0e5bc3"
+source = "git+https://github.com/superlou/Speedy2D.git#17d6f904f9bfa7341a253e2d0862a0620754e51f"
 dependencies = [
  "backtrace",
  "earcutr",
