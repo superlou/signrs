@@ -18,6 +18,12 @@ watch_json("text.json", |new_data| {
     data = new_data;
 });
 
+fn offset(x, y, func) {
+    push_offset(x, y);
+    func.call();
+    pop_offset();
+}
+
 fn draw(dt) {
     t += dt;
     clear_screen(color_bg);
@@ -38,9 +44,12 @@ fn draw(dt) {
               100. + 50 * cos(10 * t), 100.);
     
     fps = 0.9 * fps + 0.1 * (1 / dt);
-    draw_text("FPS: " + str(fps, 1), font, 18., color_white, 800., 10.);
-    draw_text("Time: " + str(now(), "%-I:%M:%S %P", true), font, 18., color_white, 800., 30.);
     
+    offset(800., 10., || {
+        draw_text("FPS: " + str(fps, 1), font, 18., color_white, 0., 0.);
+        draw_text("Time: " + str(now(), "%-I:%M:%S %P", true), font, 18., color_white, 0., 20.);        
+    });
+
     draw_image(seahorse, 400., 150., 207., 212., 0.5 + 0.5 * sin(2 * t));
     
     for (text, i) in data.items {

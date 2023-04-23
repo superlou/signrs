@@ -41,6 +41,8 @@ pub struct SignWindowHandler {
     last_mouse_down_time: Option<Instant>,
     is_fullscreen: bool,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
+    draw_offset_stack: Vec<Vec2>,
+    draw_offset: Vec2,
     pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
     watches: Rc<RefCell<HashMap<PathBuf, FnPtr>>>,
@@ -57,6 +59,15 @@ enum GraphicsCalls {
     DrawText(Vec2, Color, Rc<FormattedTextBlock>),
     DrawImage(Vec2, String),
     DrawRectangleImageTinted(Rectangle, String, Color),
+    PushOffset(Vec2),
+    PopOffset(),
+}
+
+fn offset_rect(rect: &Rectangle, offset: Vec2) -> Rectangle {
+    Rectangle::new(
+        rect.top_left() + offset,
+        rect.bottom_right() + offset,
+    )
 }
 
 impl WindowHandler<String> for SignWindowHandler {
@@ -100,16 +111,31 @@ impl WindowHandler<String> for SignWindowHandler {
         for call in self.graphics_calls.clone().borrow().iter() {
             match call {
                 GraphicsCalls::ClearScreen(c) => graphics.clear_screen(*c),
-                GraphicsCalls::DrawRectangle(r, c) => graphics.draw_rectangle(r.clone(), *c),
-                GraphicsCalls::DrawText(pos, c, block) => graphics.draw_text(pos, *c, block),
-                GraphicsCalls::DrawImage(pos, path_string) => {
-                    let image_handle = self.get_image_handle(path_string, graphics);
-                    graphics.draw_image(pos, &image_handle);
+                GraphicsCalls::DrawRectangle(r, c) => {
+                    graphics.draw_rectangle(offset_rect(r, self.draw_offset), *c)
                 },
                 GraphicsCalls::DrawRectangleImageTinted(r, path_string, c) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
-                    graphics.draw_rectangle_image_tinted(r.clone(), *c, &image_handle);
+                    graphics.draw_rectangle_image_tinted(
+                        offset_rect(r, self.draw_offset),
+                        *c,
+                        &image_handle
+                    );
                 },
+                GraphicsCalls::DrawText(pos, c, block) => {
+                    graphics.draw_text(pos + self.draw_offset, *c, block)
+                },
+                GraphicsCalls::DrawImage(pos, path_string) => {
+                    let image_handle = self.get_image_handle(path_string, graphics);
+                    graphics.draw_image(pos + self.draw_offset, &image_handle);
+                },
+                GraphicsCalls::PushOffset(vec2) => {
+                    self.draw_offset += *vec2;
+                    self.draw_offset_stack.push(*vec2);
+                }
+                GraphicsCalls::PopOffset() => {
+                    self.draw_offset -= self.draw_offset_stack.pop().unwrap_or(Vec2::ZERO);
+                }
             }
         }
         self.graphics_calls.borrow_mut().clear();
@@ -181,6 +207,8 @@ impl SignWindowHandler {
             last_mouse_down_time: None,
             is_fullscreen: false,
             graphics_calls: Rc::new(RefCell::new(vec![])),
+            draw_offset: Vec2::ZERO,
+            draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(sign_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
             watches: Rc::new(RefCell::new(HashMap::new())),
@@ -258,6 +286,16 @@ impl SignWindowHandler {
                 Color::from_rgba(1.0, 1.0, 1.0, alpha),
             ));
         });
+        
+        let graphics_calls = self.graphics_calls.clone();
+        self.script_env.register_fn("push_offset", move |x: f32, y: f32| {
+            graphics_calls.borrow_mut().push(GraphicsCalls::PushOffset((x, y).into()));
+        });
+        
+        let graphics_calls = self.graphics_calls.clone();        
+        self.script_env.register_fn("pop_offset", move || {
+            graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset());
+        });        
         
         let root_path = self.root_path.clone();
         let watches = self.watches.clone();

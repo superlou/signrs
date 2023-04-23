@@ -117,7 +117,7 @@ impl ScriptEnv {
             Err(e) => Err(ScriptError::EvalAltError(e))
         }
     }
-    
+        
     pub fn parse_json_file(&self, path: &Path) -> Result<Map, ScriptError> {
         let json_text = match read_to_string(&path) {
             Ok(s) => s,
