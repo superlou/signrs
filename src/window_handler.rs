@@ -1,16 +1,20 @@
-use std::time::{Instant, Duration};
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
 use std::fs;
 use std::sync::mpsc;
+use std::path::{Path, PathBuf};
+use std::rc::Rc;
+use std::sync::{Arc, Mutex};
+use std::time::{Instant, Duration};
 
 use notify::{Watcher, RecursiveMode};
 use rhai::{Array, FnPtr};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
-use speedy2d::window::{WindowHandler, WindowHelper, MouseButton, WindowFullscreenMode};
+use speedy2d::window::{
+    WindowHandler, WindowHelper, WindowStartupInfo,
+    MouseButton, WindowFullscreenMode
+};
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
 use speedy2d::font::{Font, TextLayout, TextOptions, FormattedTextBlock};
@@ -26,13 +30,18 @@ enum SignError {
     EvalAltError(#[from] ScriptError),
 }
 
+// #[derive(Clone)]
+// enum UserEvents {
+//     Index,
+// }
+
 pub struct SignWindowHandler {
     script_env: ScriptEnv,
     last_frame_time: Instant,
     last_mouse_down_time: Option<Instant>,
     is_fullscreen: bool,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
-    root_path: Rc<RefCell<PathBuf>>,
+    pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
     watches: Rc<RefCell<HashMap<PathBuf, FnPtr>>>,
     
@@ -50,8 +59,13 @@ enum GraphicsCalls {
     DrawRectangleImageTinted(Rectangle, String, Color),
 }
 
-impl WindowHandler for SignWindowHandler {
-    fn on_draw(&mut self, helper: &mut WindowHelper, graphics: &mut Graphics2D) {
+impl WindowHandler<String> for SignWindowHandler {
+    fn on_start(&mut self, helper: &mut WindowHelper<String>, _info: WindowStartupInfo) {
+        let sender = helper.create_user_event_sender();
+        crate::server::start_server(&self, Mutex::new(sender));
+    }
+    
+    fn on_draw(&mut self, helper: &mut WindowHelper<String>, graphics: &mut Graphics2D) {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
         
@@ -103,7 +117,7 @@ impl WindowHandler for SignWindowHandler {
         helper.request_redraw();
     }
     
-    fn on_mouse_button_down(&mut self, helper: &mut WindowHelper<()>, _button: MouseButton) {
+    fn on_mouse_button_down(&mut self, helper: &mut WindowHelper<String>, _button: MouseButton) {
         let double_click_timeout = Duration::from_millis(500);
         let now = Instant::now();
         
@@ -116,13 +130,21 @@ impl WindowHandler for SignWindowHandler {
         self.last_mouse_down_time = Some(now);
     }
     
-    fn on_fullscreen_status_changed(&mut self, _helper: &mut WindowHelper<()>, fullscreen: bool) {
+    fn on_fullscreen_status_changed(&mut self, _helper: &mut WindowHelper<String>, fullscreen: bool) {
         self.is_fullscreen = fullscreen;
+    }
+    
+    fn on_user_event(
+        &mut self,
+        helper: &mut WindowHelper<String>,
+        user_event: String
+    ) {
+        println!("{}", user_event);
     }
 }
 
 impl SignWindowHandler {
-    fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<()>) {
+    fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<String>) {
         if self.is_fullscreen {
             helper.set_fullscreen_mode(WindowFullscreenMode::Windowed);
         } else {
@@ -159,7 +181,7 @@ impl SignWindowHandler {
             last_mouse_down_time: None,
             is_fullscreen: false,
             graphics_calls: Rc::new(RefCell::new(vec![])),
-            root_path: Rc::new(RefCell::new(sign_root.as_ref().to_path_buf())),
+            root_path: Arc::new(Mutex::new(sign_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
             watches: Rc::new(RefCell::new(HashMap::new())),
             watcher: Box::new(watcher),
@@ -201,7 +223,7 @@ impl SignWindowHandler {
         let root_path = self.root_path.clone();
         self.script_env.register_type::<Font>("Font")
             .register_fn("new_font", move |font_path: &str| {
-                let mut full_path = root_path.borrow().clone();
+                let mut full_path = root_path.lock().unwrap().clone();
                 full_path.push(font_path);
                 dbg!(&full_path);
                 
@@ -240,7 +262,7 @@ impl SignWindowHandler {
         let root_path = self.root_path.clone();
         let watches = self.watches.clone();
         self.script_env.register_fn("watch_json", move |path_string: &str, fn_ptr: FnPtr| {
-            let mut json_path = root_path.borrow().clone();
+            let mut json_path = root_path.lock().unwrap().clone();
             json_path.push(path_string);
             let canonical_path = fs::canonicalize(json_path).unwrap();
             watches.borrow_mut().insert(canonical_path.clone(), fn_ptr.clone());
@@ -272,7 +294,7 @@ impl SignWindowHandler {
         let image_handle = match self.image_handles.borrow_mut().get_mut(path_string) {
             Some(image_handle) => image_handle.clone(),
             None => {
-                let mut path = self.root_path.borrow().clone();
+                let mut path = self.root_path.lock().unwrap().clone();
                 path.push(path_string);
                 let image_handle = graphics.create_image_from_file_path(None, ImageSmoothingMode::Linear, path).unwrap();
                 created = true;

@@ -11,3 +11,4 @@ rhai = {version = "1.13", features = ["f32_float", "internals"]}
 notify = "5.1.0"
 thiserror = "1.0"
 chrono = "0.4"
+rouille = "3.6"
