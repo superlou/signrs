@@ -63,13 +63,6 @@ enum GraphicsCalls {
     PopOffset(),
 }
 
-fn offset_rect(rect: &Rectangle, offset: Vec2) -> Rectangle {
-    Rectangle::new(
-        rect.top_left() + offset,
-        rect.bottom_right() + offset,
-    )
-}
-
 impl WindowHandler<String> for SignWindowHandler {
     fn on_start(&mut self, helper: &mut WindowHelper<String>, _info: WindowStartupInfo) {
         let sender = helper.create_user_event_sender();
@@ -112,12 +105,12 @@ impl WindowHandler<String> for SignWindowHandler {
             match call {
                 GraphicsCalls::ClearScreen(c) => graphics.clear_screen(*c),
                 GraphicsCalls::DrawRectangle(r, c) => {
-                    graphics.draw_rectangle(offset_rect(r, self.draw_offset), *c)
+                    graphics.draw_rectangle(r.with_offset(self.draw_offset), *c)
                 },
                 GraphicsCalls::DrawRectangleImageTinted(r, path_string, c) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
                     graphics.draw_rectangle_image_tinted(
-                        offset_rect(r, self.draw_offset),
+                        r.with_offset(self.draw_offset),
                         *c,
                         &image_handle
                     );
