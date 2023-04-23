@@ -39,7 +39,7 @@ pub struct SignWindowHandler {
     script_env: ScriptEnv,
     last_frame_time: Instant,
     last_mouse_down_time: Option<Instant>,
-    is_fullscreen: bool,
+    pub is_fullscreen: Arc<Mutex<bool>>,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
     draw_offset_stack: Vec<Vec2>,
     draw_offset: Vec2,
@@ -150,7 +150,7 @@ impl WindowHandler<String> for SignWindowHandler {
     }
     
     fn on_fullscreen_status_changed(&mut self, _helper: &mut WindowHelper<String>, fullscreen: bool) {
-        self.is_fullscreen = fullscreen;
+        *self.is_fullscreen.lock().unwrap() = fullscreen;
     }
     
     fn on_user_event(
@@ -164,7 +164,7 @@ impl WindowHandler<String> for SignWindowHandler {
 
 impl SignWindowHandler {
     fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<String>) {
-        if self.is_fullscreen {
+        if *self.is_fullscreen.lock().unwrap() {
             helper.set_fullscreen_mode(WindowFullscreenMode::Windowed);
         } else {
             helper.set_fullscreen_mode(WindowFullscreenMode::FullscreenBorderless);
@@ -198,7 +198,7 @@ impl SignWindowHandler {
             script_env: ScriptEnv::new(&main_script),
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
-            is_fullscreen: false,
+            is_fullscreen: Arc::new(Mutex::new(false)),
             graphics_calls: Rc::new(RefCell::new(vec![])),
             draw_offset: Vec2::ZERO,
             draw_offset_stack: vec![],
