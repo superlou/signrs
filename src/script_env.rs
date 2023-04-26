@@ -31,13 +31,9 @@ impl ScriptEnv {
         let mut engine = Engine::new();
         let resolver = FileModuleResolver::new_with_path(app_path);
         engine.set_module_resolver(resolver);
-
-        let mut main = app_path.clone().to_owned();
-        main.push("main.rhai");
         
         let scope = Scope::new();        
-        let ast = engine.compile_file_with_scope(&scope, main).unwrap();
-        
+        let ast = AST::empty();       
         let state: Dynamic = Map::new().into();
         
         ScriptEnv {
@@ -78,7 +74,7 @@ impl ScriptEnv {
         
         let mut main = app_path.clone().to_owned();
         main.push("main.rhai");
-        self.ast = self.engine.compile_file_with_scope(&self.scope, main).unwrap();
+        self.ast = self.engine.compile_file_with_scope(&self.scope, main)?;
         
         let options = CallFnOptions::new().bind_this_ptr(&mut self.state);
         match self.engine.call_fn_with_options::<()>(options, &mut self.scope, &self.ast, "init", ()) {
@@ -87,6 +83,7 @@ impl ScriptEnv {
         }
     }
     
+    #[allow(dead_code)]
     pub fn hotload_rhai(&mut self, path: &Path) -> Result<(), ScriptError> {
         let new_ast = self.engine.compile_file_with_scope(&self.scope, path.to_owned())?;
         self.ast.combine(new_ast);
@@ -106,6 +103,7 @@ impl ScriptEnv {
         self
     }
     
+    #[allow(dead_code)]
     pub fn get_value<T: Variant + Clone>(&self, name: &str) -> Option<T> {
         self.scope.get_value::<T>(name)
     }
@@ -115,6 +113,7 @@ impl ScriptEnv {
         map.get(name).cloned()
     }
     
+    #[allow(dead_code)]
     pub fn call_fn_ptr<T>(&self, fn_ptr: &FnPtr, args: impl FuncArgs) -> Result<T, ScriptError>
     where T: Variant + Clone
     {
@@ -124,6 +123,7 @@ impl ScriptEnv {
         }
     }
    
+    #[allow(dead_code)]
     pub fn call_fn<T>(&mut self, name: &str, args: impl FuncArgs) -> Result<T, ScriptError>
     where T: Variant + Clone
     {
@@ -155,7 +155,7 @@ impl ScriptEnv {
             Err(e) => Err(ScriptError::EvalAltError(e))
         }
     }
-           
+       
     pub fn call_fn_ptr_bound(&mut self, context_store: &NativeCallContextStore, fn_ptr: &FnPtr, args: impl AsMut<[Dynamic]>) -> Result<Dynamic, ScriptError>
     {
         let context = context_store.create_context(&self.engine);

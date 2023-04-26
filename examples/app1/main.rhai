@@ -16,7 +16,7 @@ fn init() {
     
     this.fps = 0;
     
-    this.data = #{};
+    this.data = #{items: []};
     watch_json("text.json", |new_data| {
         this.data = new_data;
     });
@@ -26,7 +26,7 @@ fn draw(dt) {
     this.t += dt;
     let t = this.t;
     clear_screen(this.color_bg);
-    
+
     draw_image(this.image, 0.0, 0.0, 960., 540.);    
     
     draw_rectangle(
@@ -38,10 +38,10 @@ fn draw(dt) {
     let offset_y = 30 * sin(5 * t);
     
     draw_rectangle(50.0 + offset_x, 50.0 + offset_y, 140.0 + offset_x, 180.0 + offset_y, this.color_blue);
-    
+
     draw_text("Hello, World!", this.font, 32., this.color_white,
               100. + 50 * cos(10 * t), 100.);
-    
+
     this.fps = 0.9 * this.fps + 0.1 * (1 / dt);
     
     push_offset(800., 10.);
