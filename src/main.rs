@@ -10,7 +10,7 @@ use window_handler::SignWindowHandler;
 
 fn main() {
     println!("Starting...");
-    let handler = SignWindowHandler::new("examples/display1");
+    let handler = SignWindowHandler::new("examples/app1");
     let resolution = handler.get_resolution().expect("Script didn't set resolution!");
     let multisampling = handler.get_multisampling().unwrap_or(1_u16);
     

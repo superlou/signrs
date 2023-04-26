@@ -8,7 +8,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Instant, Duration};
 
 use notify::{Watcher, RecursiveMode};
-use rhai::{Array, FnPtr};
+use rhai::{Array, FnPtr, Dynamic, NativeCallContext, NativeCallContextStore};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
 use speedy2d::window::{
@@ -45,7 +45,7 @@ pub struct SignWindowHandler {
     draw_offset: Vec2,
     pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
-    watches: Rc<RefCell<HashMap<PathBuf, FnPtr>>>,
+    watches: Rc<RefCell<HashMap<PathBuf, (NativeCallContextStore, FnPtr)>>>,
     
     #[allow(dead_code)] // Required to keep watcher in scope
     watcher: Box<dyn Watcher>,
@@ -75,10 +75,16 @@ impl WindowHandler<String> for SignWindowHandler {
         
         for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
             // Check if it's a watched file with a callback
-            if let Some(fn_ptr) = self.watches.borrow().get(&changed_path_buf) {
+            if let Some((context_store, fn_ptr)) = self.watches.borrow().get(&changed_path_buf) {
                 match self.script_env.parse_json_file(&changed_path_buf) {
-                    Ok(json_data) => self.script_env.call_fn_ptr::<()>(fn_ptr, (json_data,)).unwrap(),
-                    Err(e) => println!("{}", e),
+                    Ok(json_data) => {
+                        let _ = self.script_env.call_fn_ptr_bound(
+                            context_store,
+                            fn_ptr,
+                            [Dynamic::from_map(json_data)]
+                        ).unwrap();
+                    },
+                    Err(e) => {println!("{}", e);},
                 };
             }
             
@@ -96,7 +102,7 @@ impl WindowHandler<String> for SignWindowHandler {
         }
 
         // Call script draw function
-        if let Err(err) = self.script_env.call_fn::<()>("draw", (dt,)) {
+        if let Err(err) = self.script_env.call_fn_bound::<()>("draw", (dt, )) {
             dbg!(&err);
         }
 
@@ -171,10 +177,7 @@ impl SignWindowHandler {
         }
     }
     
-    pub fn new<P: AsRef<Path>>(sign_root: P) -> Self {       
-        let mut main_script = PathBuf::from(sign_root.as_ref());
-        main_script.push("main.rhai");
-        
+    pub fn new<P: AsRef<Path>>(app_root: P) -> Self {       
         let (tx, rx) = mpsc::channel();
         let tx_for_engine = tx.clone();
          
@@ -192,17 +195,17 @@ impl SignWindowHandler {
             }
         }).unwrap();
          
-        watcher.watch(sign_root.as_ref(), RecursiveMode::Recursive).unwrap();
+        watcher.watch(app_root.as_ref(), RecursiveMode::Recursive).unwrap();
        
         let mut handler = SignWindowHandler {
-            script_env: ScriptEnv::new(&main_script),
+            script_env: ScriptEnv::new(app_root.as_ref()),
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
             is_fullscreen: Arc::new(Mutex::new(false)),
             graphics_calls: Rc::new(RefCell::new(vec![])),
             draw_offset: Vec2::ZERO,
             draw_offset_stack: vec![],
-            root_path: Arc::new(Mutex::new(sign_root.as_ref().to_path_buf())),
+            root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
             watches: Rc::new(RefCell::new(HashMap::new())),
             watcher: Box::new(watcher),
@@ -210,9 +213,9 @@ impl SignWindowHandler {
         };
         
         handler.register_fns_and_types(tx_for_engine);
-        if let Err(err) = handler.script_env.eval_initial() {
+        if let Err(err) = handler.script_env.eval_initial(app_root.as_ref()) {
             dbg!(&err);
-        }      
+        }
         handler
     }
 
@@ -246,8 +249,6 @@ impl SignWindowHandler {
             .register_fn("new_font", move |font_path: &str| {
                 let mut full_path = root_path.lock().unwrap().clone();
                 full_path.push(font_path);
-                dbg!(&full_path);
-                
                 let bytes = std::fs::read(full_path.as_path()).unwrap();
                 let font = Font::new(&bytes).unwrap();
                 font
@@ -292,31 +293,31 @@ impl SignWindowHandler {
         
         let root_path = self.root_path.clone();
         let watches = self.watches.clone();
-        self.script_env.register_fn("watch_json", move |path_string: &str, fn_ptr: FnPtr| {
+        self.script_env.register_fn("watch_json", move |context: NativeCallContext, path_string: &str, fn_ptr: FnPtr| {
             let mut json_path = root_path.lock().unwrap().clone();
             json_path.push(path_string);
             let canonical_path = fs::canonicalize(json_path).unwrap();
-            watches.borrow_mut().insert(canonical_path.clone(), fn_ptr.clone());
+            watches.borrow_mut().insert(canonical_path.clone(), (context.store_data(), fn_ptr.clone()));
             file_changed_tx.send(canonical_path).unwrap();
         });         
     }
     
-    pub fn get_resolution(&self) -> Option<(u32, u32)> {       
-        match self.script_env.get_value::<Array>("resolution") {
-            Some(a) => {
+    pub fn get_resolution(&self) -> Option<(u32, u32)> {
+        match self.script_env.get_state_value("resolution").unwrap().into_array() {
+            Ok(a) => {
                 match (a[0].clone().try_cast::<i64>(), a[1].clone().try_cast::<i64>()) {
                     (Some(x), Some(y)) => Some((x as u32, y as u32)),
                     _ => None,
                 }
             },
-            None => None
+            Err(_) => None
         }
     }
     
     pub fn get_multisampling(&self) -> Option<u16> {
-        match self.script_env.get_value::<i64>("multisampling") {
-            Some(m) => u16::try_from(m).ok(),
-            None => None,
+        match self.script_env.get_state_value("multisampling").unwrap().as_int() {
+            Ok(m) => u16::try_from(m).ok(),
+            Err(_) => None,
         }
     }
     

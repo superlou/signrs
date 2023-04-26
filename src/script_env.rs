@@ -2,9 +2,12 @@ use std::path::Path;
 use std::fs::read_to_string;
 
 use chrono::DateTime;
-use rhai::{Engine, Scope, AST, CallFnOptions, FnPtr, EvalAltResult, FuncArgs, RegisterNativeFunction, Map};
+use rhai::{
+    Engine, Scope, AST, CallFnOptions, FnPtr, EvalAltResult, FuncArgs,
+    RegisterNativeFunction, Map, Variant, Identifier, Dynamic, NativeCallContextStore
+};
+use rhai::module_resolvers::FileModuleResolver;
 use thiserror::Error;
-use rhai::{Variant, Identifier};
 
 #[derive(Error, Debug)]
 pub enum ScriptError {
@@ -20,16 +23,25 @@ pub struct ScriptEnv {
     engine: Engine,
     ast: AST,
     scope: Scope<'static>,
+    state: Dynamic,
 }
 
 impl ScriptEnv {
-    pub fn new(main: &Path) -> Self {
-        let engine = Engine::new();
-        let ast = engine.compile_file(main.to_owned()).unwrap();
+    pub fn new(app_path: &Path) -> Self {
+        let mut engine = Engine::new();
+        let resolver = FileModuleResolver::new_with_path(app_path);
+        engine.set_module_resolver(resolver);
+
+        let mut main = app_path.clone().to_owned();
+        main.push("main.rhai");
+        
+        let scope = Scope::new();        
+        let ast = engine.compile_file_with_scope(&scope, main).unwrap();
+        
+        let state: Dynamic = Map::new().into();
         
         ScriptEnv {
-            engine, ast,
-            scope: Scope::new(),
+            engine, ast, scope, state
         }
     }
     
@@ -60,13 +72,18 @@ impl ScriptEnv {
             .register_fn("now", || chrono::Utc::now());
     }
     
-    pub fn eval_initial(&mut self) -> Result<(), ScriptError> {
+    pub fn eval_initial(&mut self, app_path: &Path) -> Result<(), ScriptError> {
         self.register_str_formatting();
         self.register_datetime();
         
-        match self.engine.eval_ast_with_scope::<()>(&mut self.scope, &self.ast) {
+        let mut main = app_path.clone().to_owned();
+        main.push("main.rhai");
+        self.ast = self.engine.compile_file_with_scope(&self.scope, main).unwrap();
+        
+        let options = CallFnOptions::new().bind_this_ptr(&mut self.state);
+        match self.engine.call_fn_with_options::<()>(options, &mut self.scope, &self.ast, "init", ()) {
             Ok(_) => Ok(()),
-            Err(e) => Err(ScriptError::EvalAltError(e))
+            Err(e) => Err(ScriptError::EvalAltError(e)),
         }
     }
     
@@ -93,6 +110,11 @@ impl ScriptEnv {
         self.scope.get_value::<T>(name)
     }
     
+    pub fn get_state_value(&self, name: &str) -> Option<Dynamic> {
+        let map = self.state.clone_cast::<Map>();
+        map.get(name).cloned()
+    }
+    
     pub fn call_fn_ptr<T>(&self, fn_ptr: &FnPtr, args: impl FuncArgs) -> Result<T, ScriptError>
     where T: Variant + Clone
     {
@@ -101,11 +123,11 @@ impl ScriptEnv {
             Err(e) => Err(ScriptError::EvalAltError(e)),
         }
     }
-    
+   
     pub fn call_fn<T>(&mut self, name: &str, args: impl FuncArgs) -> Result<T, ScriptError>
     where T: Variant + Clone
     {
-        let options = CallFnOptions::new().eval_ast(false);
+        let options = CallFnOptions::new().eval_ast(true);
         match self.engine.call_fn_with_options::<T>(
             options,
             &mut self.scope,
@@ -115,6 +137,32 @@ impl ScriptEnv {
         ) {
             Ok(ret) => Ok(ret),
             Err(e) => Err(ScriptError::EvalAltError(e))
+        }
+    }
+        
+    pub fn call_fn_bound<T>(&mut self, name: &str, args: impl FuncArgs) -> Result<T, ScriptError>
+    where T: Variant + Clone
+    {
+        let options = CallFnOptions::new().bind_this_ptr(&mut self.state);
+        match self.engine.call_fn_with_options::<T>(
+            options,
+            &mut self.scope,
+            &mut self.ast,
+            name,
+            args
+        ) {
+            Ok(ret) => Ok(ret),
+            Err(e) => Err(ScriptError::EvalAltError(e))
+        }
+    }
+           
+    pub fn call_fn_ptr_bound(&mut self, context_store: &NativeCallContextStore, fn_ptr: &FnPtr, args: impl AsMut<[Dynamic]>) -> Result<Dynamic, ScriptError>
+    {
+        let context = context_store.create_context(&self.engine);
+        
+        match fn_ptr.call_raw(&context, Some(&mut self.state), args) {
+            Ok(ret) => Ok(ret),
+            Err(e) => Err(ScriptError::EvalAltError(e)),
         }
     }
         
