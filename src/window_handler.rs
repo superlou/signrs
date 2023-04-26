@@ -112,7 +112,6 @@ impl WindowHandler<String> for SignWindowHandler {
                 &self.graphics_calls,
                 &self.root_path,
                 &self.watches,
-                &self.file_change_tx
             );
             match script_env.eval_initial(&root_path) {
                 Ok(_) => {
@@ -240,7 +239,6 @@ impl SignWindowHandler {
             &handler.graphics_calls,
             &handler.root_path,
             &handler.watches,
-            &handler.file_change_tx,
         );
         
         if let Err(err) = handler.script_env.eval_initial(app_root.as_ref()) {
@@ -254,7 +252,6 @@ impl SignWindowHandler {
         graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>,
         root_path: &Arc<Mutex<PathBuf>>,
         watches: &Rc<RefCell<HashMap<PathBuf, (NativeCallContextStore, FnPtr)>>>,
-        file_change_tx: &mpsc::Sender<PathBuf>,
     ) {
         let graphics_calls_ = graphics_calls.clone();       
         script_env.register_fn("clear_screen", move |c: Color| {
