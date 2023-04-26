@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fs;
+use std::fs::{self, read_to_string};
 use std::sync::mpsc;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
@@ -9,7 +9,7 @@ use std::time::{Instant, Duration};
 
 use notify::{Watcher, RecursiveMode};
 #[allow(deprecated)]
-use rhai::{FnPtr, Dynamic, NativeCallContext, NativeCallContextStore};
+use rhai::{FnPtr, Dynamic, NativeCallContext, NativeCallContextStore, Engine};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
 use speedy2d::window::{
@@ -328,14 +328,15 @@ impl SignWindowHandler {
         
         let root_path_ = root_path.clone();
         let watches_ = watches.clone();
-        let file_change_tx_ = file_change_tx.clone();
         script_env.register_fn("watch_json", move |context: NativeCallContext, path_string: &str, fn_ptr: FnPtr| {
             let mut json_path = root_path_.lock().unwrap().clone();
             json_path.push(path_string);
-            let canonical_path = fs::canonicalize(json_path).unwrap();
+            let canonical_path = fs::canonicalize(&json_path).unwrap();
             #[allow(deprecated)]
             watches_.borrow_mut().insert(canonical_path.clone(), (context.store_data(), fn_ptr.clone()));
-            file_change_tx_.send(canonical_path).unwrap();
+            
+            let json_text = read_to_string(&json_path).unwrap_or("#{}".to_owned());
+            Engine::new_raw().parse_json(json_text, true)
         });         
     }
     

@@ -15,9 +15,8 @@ fn init() {
     this.t = 0;
     
     this.fps = 0;
-    
-    this.data = #{items: []};
-    watch_json("text.json", |new_data| {
+
+    this.data = watch_json("text.json", |new_data| {
         this.data = new_data;
     });
 }
