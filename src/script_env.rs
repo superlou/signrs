@@ -1,13 +1,15 @@
 use std::path::Path;
 use std::fs::read_to_string;
 
-use chrono::DateTime;
 use rhai::{
     Engine, Scope, AST, CallFnOptions, FnPtr, EvalAltResult, FuncArgs,
     RegisterNativeFunction, Map, Variant, Identifier, Dynamic, NativeCallContextStore
 };
+use rhai::exported_module;
 use rhai::module_resolvers::FileModuleResolver;
 use thiserror::Error;
+
+use crate::rhai_modules;
 
 #[derive(Error, Debug)]
 pub enum ScriptError {
@@ -32,6 +34,9 @@ impl ScriptEnv {
         let resolver = FileModuleResolver::new_with_path(app_path);
         engine.set_module_resolver(resolver);
         
+        engine.register_global_module(exported_module!(rhai_modules::str).into());
+        engine.register_global_module(exported_module!(rhai_modules::datetime).into());
+        
         let scope = Scope::new();        
         let ast = AST::empty();       
         let state: Dynamic = Map::new().into();
@@ -41,37 +46,7 @@ impl ScriptEnv {
         }
     }
     
-    fn register_str_formatting(&mut self) {
-        self.engine.register_fn("str", |f: f32| {
-           format!("{0}", f)
-        });
-        
-        self.engine.register_fn("str", |f: f32, precision: i64| {
-           format!("{0:.1$}", f, precision as usize)
-        });
-        
-        self.engine.register_fn("str", |dt: DateTime<chrono::Utc>| {
-            dt.format("%Y-%m-%d %H:%M:%S").to_string()
-        });
-        
-        self.engine.register_fn("str", |dt: DateTime<chrono::Utc>, fmt: &str, as_local: bool| {
-            if as_local {
-                dt.with_timezone(&chrono::Local).format(fmt).to_string()
-            } else {
-                dt.format(fmt).to_string()
-            }
-        });        
-    }
-    
-    fn register_datetime(&mut self) {
-        self.engine.register_type_with_name::<DateTime<chrono::Utc>>("DateTime")
-            .register_fn("now", || chrono::Utc::now());
-    }
-    
     pub fn eval_initial(&mut self, app_path: &Path) -> Result<(), ScriptError> {
-        self.register_str_formatting();
-        self.register_datetime();
-        
         let mut main = app_path.clone().to_owned();
         main.push("main.rhai");
         self.ast = self.engine.compile_file_with_scope(&self.scope, main)?;
@@ -155,9 +130,10 @@ impl ScriptEnv {
             Err(e) => Err(ScriptError::EvalAltError(e))
         }
     }
-       
+
     pub fn call_fn_ptr_bound(&mut self, context_store: &NativeCallContextStore, fn_ptr: &FnPtr, args: impl AsMut<[Dynamic]>) -> Result<Dynamic, ScriptError>
     {
+        #[allow(deprecated)]
         let context = context_store.create_context(&self.engine);
         
         match fn_ptr.call_raw(&context, Some(&mut self.state), args) {

@@ -5,6 +5,7 @@ mod server;
 mod iter_util;
 mod script_env;
 mod window_handler;
+mod rhai_modules;
 use window_handler::SignWindowHandler;
 
 
