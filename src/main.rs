@@ -1,3 +1,5 @@
+use std::env;
+
 use speedy2d::Window;
 use speedy2d::window::{WindowCreationOptions, WindowSize};
 
@@ -8,10 +10,17 @@ mod window_handler;
 mod rhai_modules;
 use window_handler::SignWindowHandler;
 
-
-fn main() {
-    println!("Starting...");
-    let handler = SignWindowHandler::new("examples/app1");
+fn main() { 
+    let args: Vec<String> = env::args().collect();
+    
+    if args.len() < 2 {
+        println!("No application specified!");
+        return;
+    }
+    
+    let app_path = &args[1];
+    println!("Starting {}...", &app_path);
+    let handler = SignWindowHandler::new(&app_path);
     let resolution = handler.get_resolution().expect("Script didn't set resolution!");
     let multisampling = handler.get_multisampling().unwrap_or(1_u16);
     
