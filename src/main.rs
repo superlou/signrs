@@ -5,9 +5,10 @@ use speedy2d::window::{WindowCreationOptions, WindowSize};
 
 mod server;
 mod iter_util;
-mod script_env;
 mod window_handler;
-mod rhai_modules;
+// mod script_env;
+// mod rhai_modules;
+mod js_env;
 use window_handler::SignWindowHandler;
 
 fn main() { 
