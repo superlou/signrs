@@ -5,6 +5,7 @@ use std::cell::RefCell;
 
 use boa_engine::{Context, JsValue, JsResult, Source, NativeFunction, class::{Class, ClassBuilder}, property::Attribute, value::TryFromJs, JsError};
 use boa_gc::{GcRefCell, Trace, Finalize, empty_trace};
+use boa_runtime::Console;
 use thiserror::Error;
 
 use crate::window_handler::GraphicsCalls;
@@ -105,6 +106,10 @@ pub fn register_fns_and_types(
     script_env: &mut JsEnv,
     graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>
 ) {
+    let console = Console::init(&mut script_env.context);
+    script_env.context.register_global_property(Console::NAME, console, Attribute::all())
+        .expect("Unable to create console object");
+    
     script_env.context.register_global_class::<JsColor>().expect("Could not register JsColor");
     
     let graphics_calls_ = graphics_calls.clone();

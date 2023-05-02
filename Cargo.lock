@@ -135,7 +135,7 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "boa_ast"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "bitflags 2.2.1",
  "boa_interner",
@@ -147,7 +147,7 @@ dependencies = [
 [[package]]
 name = "boa_engine"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "bitflags 2.2.1",
  "boa_ast",
@@ -185,7 +185,7 @@ dependencies = [
 [[package]]
 name = "boa_gc"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "boa_macros",
  "boa_profiler",
@@ -195,7 +195,7 @@ dependencies = [
 [[package]]
 name = "boa_icu_provider"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "icu_collections",
  "icu_normalizer",
@@ -208,7 +208,7 @@ dependencies = [
 [[package]]
 name = "boa_interner"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "boa_macros",
  "hashbrown 0.13.2",
@@ -222,7 +222,7 @@ dependencies = [
 [[package]]
 name = "boa_macros"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -233,7 +233,7 @@ dependencies = [
 [[package]]
 name = "boa_parser"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
 dependencies = [
  "bitflags 2.2.1",
  "boa_ast",
@@ -253,7 +253,17 @@ dependencies = [
 [[package]]
 name = "boa_profiler"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#dff815d545b883f64246472cd39b1be0649ad8fe"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
+
+[[package]]
+name = "boa_runtime"
+version = "0.16.0"
+source = "git+https://github.com/boa-dev/boa.git#06360226c068e75bd8063528b0df6f749226f84c"
+dependencies = [
+ "boa_engine",
+ "boa_gc",
+ "rustc-hash",
+]
 
 [[package]]
 name = "brotli"
@@ -1957,9 +1967,9 @@ dependencies = [
 
 [[package]]
 name = "regress"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d995d590bd8ec096d1893f414bf3f5e8b0ee4c9eed9a5642b9766ef2c8e2e8e9"
+checksum = "82a9ecfa0cb04d0b04dddb99b8ccf4f66bc8dfd23df694b398570bd8ae3a50fb"
 dependencies = [
  "hashbrown 0.13.2",
  "memchr",
@@ -2155,6 +2165,7 @@ version = "0.1.0"
 dependencies = [
  "boa_engine",
  "boa_gc",
+ "boa_runtime",
  "chrono",
  "notify",
  "rhai",
