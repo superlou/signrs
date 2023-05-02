@@ -1,37 +1,48 @@
+use std::path::PathBuf;
 use std::{path::Path};
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use boa_engine::{Context, JsValue, JsResult, Source, NativeFunction, class::{Class, ClassBuilder}, property::Attribute, value::TryFromJs, JsError};
 use boa_gc::{GcRefCell, Trace, Finalize, empty_trace};
+use thiserror::Error;
+
 use crate::window_handler::GraphicsCalls;
+
+#[derive(Error, Debug)]
+pub enum ScriptError {
+    #[error("EvalAltError: {0}")]
+    EvalAltError(#[from] JsError),
+}
 
 pub struct JsEnv {
     context: Context<'static>,
+    app_path: PathBuf,
 }
 
 impl JsEnv {
     pub fn new(app_path: &Path) -> Self {
-        let mut context = Context::default();
-        
-        let mut main = app_path.clone().to_owned();
-        main.push("main.js");
-        
-        let source = Source::from_filepath(&main).unwrap();
-        context.eval_script(source).unwrap();
+        let context = Context::default();
         
         JsEnv {
             context,
+            app_path: app_path.to_owned(),
         }
     }
     
-    pub fn call_init(&mut self) {
+    pub fn call_init(&mut self) -> Result<(), JsError> {
+        let mut main = self.app_path.clone().to_owned();
+        main.push("main.js");
+        let source = Source::from_filepath(&main).unwrap();
+        self.context.eval_script(source)?;           
+        
         let global_object = self.context.global_object().clone();
         let init = global_object.get("init", &mut self.context).unwrap();
         let init = init.as_object().unwrap();
-        init.call(&boa_engine::JsValue::Null, &[], &mut self.context).unwrap();
+        init.call(&boa_engine::JsValue::Null, &[], &mut self.context)?;
+        Ok(())
     }
-    
+
     pub fn call_draw(&mut self) {
         let global_object = self.context.global_object().clone();
         let init = global_object.get("draw", &mut self.context).unwrap();

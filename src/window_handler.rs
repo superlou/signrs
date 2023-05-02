@@ -21,7 +21,7 @@ use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
 use crate::iter_util::iter_unique;
-// use crate::script_env::{ScriptEnv, ScriptError};
+use crate::js_env;
 use crate::js_env::JsEnv;
 
 #[derive(Error, Debug)]
@@ -94,10 +94,9 @@ impl WindowHandler<String> for SignWindowHandler {
             // }
             
             // If not explicitly watched, do other updates
-            let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());
-            
+            let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());            
             match extension {
-                Some(ext) if ext == "rhai" => {
+                Some(ext) if ext == "js" => {
                     reload_script_env = true;
                 },
                 _ => {},
@@ -105,21 +104,23 @@ impl WindowHandler<String> for SignWindowHandler {
         }
         
         if reload_script_env {
-            // let root_path = self.root_path.lock().unwrap().clone();
-            // let mut script_env = ScriptEnv::new(&root_path);   // todo Need to keep old scriptenv before trashing
-            // Self::register_fns_and_types(
-            //     &mut script_env,
-            //     &self.graphics_calls,
-            //     &self.root_path,
-            //     &self.watches,
-            // );
-            // match script_env.eval_initial(&root_path) {
-            //     Ok(_) => {
-            //         self.script_env = script_env;
-            //         println!("Reloaded script environment.");
-            //     },
-            //     Err(err) => { dbg!(&err); },
-            // }
+            let root_path = self.root_path.lock().unwrap().clone();
+            let mut script_env = JsEnv::new(&root_path);
+            
+            js_env::register_fns_and_types(
+                &mut script_env,
+                &self.graphics_calls,
+                // &handler.root_path,
+                // &handler.watches,
+            );
+            
+            match script_env.call_init() {
+                Ok(_) => {
+                    self.script_env = script_env;
+                    println!("Reloaded script environment.");
+                },
+                Err(err) => { dbg!(&err); },
+            };
         }
         
         // // Call script draw function
@@ -223,7 +224,7 @@ impl SignWindowHandler {
         watcher.watch(app_root.as_ref(), RecursiveMode::Recursive).unwrap();
              
         let mut handler = SignWindowHandler {
-            script_env: JsEnv::new(app_root.as_ref()), //ScriptEnv::new(app_root.as_ref()),
+            script_env: JsEnv::new(app_root.as_ref()),
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
             is_fullscreen: Arc::new(Mutex::new(false)),
@@ -245,12 +246,11 @@ impl SignWindowHandler {
             // &handler.watches,
         );
         
-        // if let Err(err) = handler.script_env.eval_initial(app_root.as_ref()) {
-        //     dbg!(&err);
-        // }
-        
-        handler.script_env.call_init();
-        
+        if let Err(err) = handler.script_env.call_init() {
+            dbg!(err);
+            panic!("Unable to initialize script environment!");
+        }
+
         handler
     }
     
