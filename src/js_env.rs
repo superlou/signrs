@@ -43,11 +43,16 @@ impl JsEnv {
         Ok(())
     }
 
-    pub fn call_draw(&mut self) {
+    pub fn call_draw(&mut self, dt: f32) -> Result<(), JsError> {
         let global_object = self.context.global_object().clone();
         let init = global_object.get("draw", &mut self.context).unwrap();
         let init = init.as_object().unwrap();
-        init.call(&boa_engine::JsValue::Null, &[], &mut self.context).unwrap();        
+        init.call(
+            &boa_engine::JsValue::Null,
+            &[JsValue::Rational(dt as f64)],
+            &mut self.context
+        )?;
+        Ok(())
     }
 }
 

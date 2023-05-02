@@ -123,11 +123,10 @@ impl WindowHandler<String> for SignWindowHandler {
             };
         }
         
-        // // Call script draw function
-        // if let Err(err) = self.script_env.call_fn_bound::<()>("draw", (dt, )) {
-        //     dbg!(&err);
-        // }
-        self.script_env.call_draw();
+        // Call script draw function
+        if let Err(err) = self.script_env.call_draw(dt) {
+            dbg!(&err);
+        }
 
         // Perform queued graphic calls
         for call in self.graphics_calls.clone().borrow().iter() {
