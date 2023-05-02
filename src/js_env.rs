@@ -58,6 +58,7 @@ impl JsEnv {
 }
 
 use speedy2d::color::Color;
+use speedy2d::shape::Rectangle;
 
 #[derive(Debug, Trace, Finalize, TryFromJs, Clone)]
 struct JsColor {
@@ -125,6 +126,25 @@ pub fn register_fns_and_types(
                     graphics_calls_.borrow_mut().push(GraphicsCalls::ClearScreenBlack);
                 }
                 
+                Ok(JsValue::Undefined)
+        })).unwrap();
+    }
+    
+    let graphics_calls_ = graphics_calls.clone();
+    unsafe {
+        script_env.context.register_global_callable(
+            "draw_rectangle",
+            1,
+            NativeFunction::from_closure(move |_this, args, _context| {
+                if args.len() > 4 {
+                    let x = args[0].as_number().unwrap() as f32;
+                    let y = args[1].as_number().unwrap() as f32;
+                    let w = args[2].as_number().unwrap() as f32;
+                    let h = args[3].as_number().unwrap() as f32;
+                    let c = args[4].as_object().unwrap().downcast_ref::<JsColor>().unwrap().clone();
+                    let r = Rectangle::from_tuples((x, y), (x + w, y + h));
+                    graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c.into()));
+                }
                 Ok(JsValue::Undefined)
         })).unwrap();
     }
