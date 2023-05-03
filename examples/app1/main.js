@@ -6,10 +6,14 @@ function init() {
 let black = new Color(0.0, 0.0, 0.0);
 let green = new Color(0.0, 1.0, 0.0, 0.8);
 let blue = new Color(0.0, 0.0, 1.0, 0.8);
+let white = new Color(1, 1, 1);
 let t = 0;
+
+let font = new Font("assets/Roboto-Regular.ttf");
 
 function draw(dt) {
   t += dt;
+  let fps = 1 / dt;
   clear_screen(black);
   
   draw_rectangle(
@@ -26,4 +30,6 @@ function draw(dt) {
     140.0 + offset_x, 180.0 + offset_y,
     blue
   );
+  
+  draw_text(font, `FPS: ${fps.toFixed(2)}`, 550, 10, white);
 }

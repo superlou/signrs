@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::str::FromStr;
 use std::{path::Path};
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -24,7 +25,10 @@ pub struct JsEnv {
 
 impl JsEnv {
     pub fn new(app_path: &Path) -> Self {
-        let context = Context::default();
+        let mut context = Context::default();
+        
+        let app_path_str = app_path.to_str().unwrap();      
+        context.global_object().set("app_path", app_path_str, true, &mut context).unwrap();
         
         JsEnv {
             context,
@@ -60,6 +64,7 @@ impl JsEnv {
 
 use speedy2d::color::Color;
 use speedy2d::shape::Rectangle;
+use speedy2d::font::{Font, TextOptions, TextLayout};
 
 #[derive(Debug, Trace, Finalize, TryFromJs, Clone)]
 struct JsColor {
@@ -104,6 +109,35 @@ impl From<JsColor> for Color {
     }
 }
 
+#[derive(Debug, Trace, Finalize, Clone)]
+struct JsFont {
+    #[unsafe_ignore_trace]
+    font: Font,
+}
+
+impl Class for JsFont {
+    const NAME: &'static str = "Font";
+    const LENGTH: usize = 1;
+
+    fn constructor(_this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<Self> {
+        let font_path = args[0].try_js_into::<String>(context)?;
+        let mut full_path = PathBuf::from_str(
+            &context.global_object().get("app_path", context).unwrap().try_js_into::<String>(context).unwrap()
+        ).unwrap();
+        
+        full_path.push(font_path);
+        
+        let bytes = std::fs::read(full_path).unwrap();
+        let font = Font::new(&bytes).unwrap();
+        
+        Ok(JsFont{font})
+    }
+    
+    fn init(_class: &mut ClassBuilder) -> JsResult<()> {
+        Ok(())
+    }
+}
+
 pub fn register_fns_and_types(
     script_env: &mut JsEnv,
     graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>
@@ -113,6 +147,7 @@ pub fn register_fns_and_types(
         .expect("Unable to create console object");
     
     script_env.context.register_global_class::<JsColor>().expect("Could not register JsColor");
+    script_env.context.register_global_class::<JsFont>().expect("Could not register JsFont");
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
@@ -120,7 +155,7 @@ pub fn register_fns_and_types(
             "clear_screen",
             1,
             NativeFunction::from_closure(move |_this, args, _context| {
-                if args.len() > 0 {
+                if args.len() >= 1 {
                     let c = args[0].as_object()
                         .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
                         .downcast_ref::<JsColor>()
@@ -143,7 +178,7 @@ pub fn register_fns_and_types(
             "draw_rectangle",
             1,
             NativeFunction::from_closure(move |_this, args, context| {
-                if args.len() > 4 {
+                if args.len() >= 5 {
                     let x = args[0].try_js_into::<f64>(context)? as f32;
                     let y = args[1].try_js_into::<f64>(context)? as f32;
                     let w = args[2].try_js_into::<f64>(context)? as f32;
@@ -162,4 +197,38 @@ pub fn register_fns_and_types(
             })
         ).unwrap();
     }
+    
+    let graphics_calls_ = graphics_calls.clone();
+    unsafe {
+        script_env.context.register_global_callable(
+            "draw_text",
+            1,
+            NativeFunction::from_closure(move |_this, args, context| {
+                if args.len() >= 5 {
+                    let js_font = args[0].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
+                        .downcast_ref::<JsFont>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
+                        .clone();
+                        
+                    let text = args[1].try_js_into::<String>(context)?;
+                    
+                    let x = args[2].try_js_into::<f64>(context)? as f32;
+                    let y = args[3].try_js_into::<f64>(context)? as f32;                    
+
+                    let c = args[4].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                        .downcast_ref::<JsColor>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                        .clone();                    
+                                                            
+                    let block = js_font.font.layout_text(&text, 18., TextOptions::new());
+                    graphics_calls_.borrow_mut().push(
+                        GraphicsCalls::DrawText((x, y).into(), c.into(), block)
+                    );
+                }
+                Ok(JsValue::Undefined)
+            })
+        ).unwrap();
+    }    
 }
