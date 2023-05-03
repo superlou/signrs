@@ -125,7 +125,7 @@ impl WindowHandler<String> for SignWindowHandler {
         
         // Call script draw function
         if let Err(err) = self.script_env.call_draw(dt) {
-            dbg!(&err);
+            println!("{}", err);
         }
 
         // Perform queued graphic calls

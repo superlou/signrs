@@ -3,6 +3,7 @@ use std::{path::Path};
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use boa_engine::JsNativeError;
 use boa_engine::{Context, JsValue, JsResult, Source, NativeFunction, class::{Class, ClassBuilder}, property::Attribute, value::TryFromJs, JsError};
 use boa_gc::{GcRefCell, Trace, Finalize, empty_trace};
 use boa_runtime::Console;
@@ -120,14 +121,20 @@ pub fn register_fns_and_types(
             1,
             NativeFunction::from_closure(move |_this, args, _context| {
                 if args.len() > 0 {
-                    let c = args[0].as_object().unwrap().downcast_ref::<JsColor>().unwrap().clone();
+                    let c = args[0].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                        .downcast_ref::<JsColor>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                        .clone();
+
                     graphics_calls_.borrow_mut().push(GraphicsCalls::ClearScreen(c.into()));
                 } else {
                     graphics_calls_.borrow_mut().push(GraphicsCalls::ClearScreenBlack);
                 }
                 
                 Ok(JsValue::Undefined)
-        })).unwrap();
+            })
+        ).unwrap();
     }
     
     let graphics_calls_ = graphics_calls.clone();
@@ -135,17 +142,24 @@ pub fn register_fns_and_types(
         script_env.context.register_global_callable(
             "draw_rectangle",
             1,
-            NativeFunction::from_closure(move |_this, args, _context| {
+            NativeFunction::from_closure(move |_this, args, context| {
                 if args.len() > 4 {
-                    let x = args[0].as_number().unwrap() as f32;
-                    let y = args[1].as_number().unwrap() as f32;
-                    let w = args[2].as_number().unwrap() as f32;
-                    let h = args[3].as_number().unwrap() as f32;
-                    let c = args[4].as_object().unwrap().downcast_ref::<JsColor>().unwrap().clone();
+                    let x = args[0].try_js_into::<f64>(context)? as f32;
+                    let y = args[1].try_js_into::<f64>(context)? as f32;
+                    let w = args[2].try_js_into::<f64>(context)? as f32;
+                    let h = args[3].try_js_into::<f64>(context)? as f32;
+
+                    let c = args[4].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                        .downcast_ref::<JsColor>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                        .clone();
+
                     let r = Rectangle::from_tuples((x, y), (x + w, y + h));
                     graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c.into()));
                 }
                 Ok(JsValue::Undefined)
-        })).unwrap();
+            })
+        ).unwrap();
     }
 }

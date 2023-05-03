@@ -24,5 +24,6 @@ function draw(dt) {
   draw_rectangle(
     50.0 + offset_x, 50.0 + offset_y,
     140.0 + offset_x, 180.0 + offset_y,
-    blue);
+    blue
+  );
 }
