@@ -138,6 +138,26 @@ impl Class for JsFont {
     }
 }
 
+#[derive(Debug, Trace, Finalize, Clone)]
+struct JsImage {
+    path: PathBuf,
+}
+
+impl Class for JsImage {
+    const NAME: &'static str = "Image";
+    const LENGTH: usize = 1;
+
+    fn constructor(_this: &JsValue, args: &[JsValue], context: &mut Context<'_>) -> JsResult<Self> {
+        let path = args[0].try_js_into::<String>(context)?;
+        let path = PathBuf::from_str(&path).unwrap();
+        Ok(Self{path})
+    }
+    
+    fn init(_class: &mut ClassBuilder<'_, '_>) -> JsResult<()> {
+        Ok(())
+    }
+}
+
 pub fn register_fns_and_types(
     script_env: &mut JsEnv,
     graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>
@@ -148,6 +168,7 @@ pub fn register_fns_and_types(
     
     script_env.context.register_global_class::<JsColor>().expect("Could not register JsColor");
     script_env.context.register_global_class::<JsFont>().expect("Could not register JsFont");
+    script_env.context.register_global_class::<JsImage>().expect("Could not register Image");
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
@@ -230,5 +251,69 @@ pub fn register_fns_and_types(
                 Ok(JsValue::Undefined)
             })
         ).unwrap();
-    }    
+    }
+    
+    let graphics_calls_ = graphics_calls.clone();
+    unsafe {
+        script_env.context.register_global_callable(
+            "draw_image",
+            1,
+            NativeFunction::from_closure(move |_this, args, context| {
+                if args.len() == 3 {
+                    let js_image = args[0].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected an Image"))?
+                        .downcast_ref::<JsImage>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Image"))?
+                        .clone();
+                    
+                    let x = args[1].try_js_into::<f64>(context)? as f32;
+                    let y = args[2].try_js_into::<f64>(context)? as f32;
+                                                            
+                    graphics_calls_.borrow_mut().push(
+                        GraphicsCalls::DrawImage((x, y).into(), js_image.path.to_str().unwrap().to_owned())
+                    );
+                } else if args.len() == 5 {
+                    let js_image = args[0].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected an Image"))?
+                        .downcast_ref::<JsImage>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Image"))?
+                        .clone();
+                    
+                    let x = args[1].try_js_into::<f64>(context)? as f32;
+                    let y = args[2].try_js_into::<f64>(context)? as f32;
+                    let w = args[3].try_js_into::<f64>(context)? as f32;
+                    let h = args[4].try_js_into::<f64>(context)? as f32;                                                            
+                                                            
+                    graphics_calls_.borrow_mut().push(
+                        GraphicsCalls::DrawRectangleImageTinted(
+                            Rectangle::new((x, y).into(), (x + w, y + h).into()),
+                            js_image.path.to_str().unwrap().to_owned(),
+                            Color::WHITE,
+                        )
+                    );
+                } else if args.len() == 6 {
+                    let js_image = args[0].as_object()
+                        .ok_or(JsNativeError::typ().with_message("Expected an Image"))?
+                        .downcast_ref::<JsImage>()
+                        .ok_or(JsNativeError::typ().with_message("Expected a Image"))?
+                        .clone();
+                    
+                    let x = args[1].try_js_into::<f64>(context)? as f32;
+                    let y = args[2].try_js_into::<f64>(context)? as f32;
+                    let w = args[3].try_js_into::<f64>(context)? as f32;
+                    let h = args[4].try_js_into::<f64>(context)? as f32;
+                    let a = args[5].try_js_into::<f64>(context)? as f32;                                                            
+                                                            
+                    graphics_calls_.borrow_mut().push(
+                        GraphicsCalls::DrawRectangleImageTinted(
+                            Rectangle::new((x, y).into(), (x + w, y + h).into()),
+                            js_image.path.to_str().unwrap().to_owned(),
+                            Color::from_rgba(1., 1., 1., a),
+                        )
+                    );
+                }                     
+                Ok(JsValue::Undefined)
+            })
+        ).unwrap();
+    }        
 }
