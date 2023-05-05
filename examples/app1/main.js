@@ -15,6 +15,11 @@ let seahorse = new Image("assets/seahorse.png");
 
 let prev_fps = 0;
 
+let data;
+data = watch_json("text.json", (new_data) => {
+  data = new_data;
+});
+
 function draw(dt) {
   t += dt;
   let fps = 0.1 * (1 / dt) + 0.9 * prev_fps;
@@ -41,4 +46,8 @@ function draw(dt) {
   draw_text(font, `FPS: ${fps.toFixed(2)}`, 550, 10, white);
   
   draw_image(seahorse, 300, 100, 207, 212, 0.5 + 0.5 * Math.sin(2 * t));
+  
+  data.items.forEach((element, i) => {
+    draw_text(font, element, 100, 350 + 18 * i, white);
+  });
 }

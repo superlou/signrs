@@ -1,3 +1,4 @@
+use std::fs::{read_to_string, self};
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::{path::Path};
@@ -5,6 +6,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use boa_engine::JsNativeError;
+use boa_engine::object::builtins::JsFunction;
 use boa_engine::{Context, JsValue, JsResult, Source, NativeFunction, class::{Class, ClassBuilder}, property::Attribute, value::TryFromJs, JsError};
 use boa_gc::{GcRefCell, Trace, Finalize, empty_trace};
 use boa_runtime::Console;
@@ -19,7 +21,7 @@ pub enum ScriptError {
 }
 
 pub struct JsEnv {
-    context: Context<'static>,
+    pub context: Context<'static>,
     app_path: PathBuf,
 }
 
@@ -158,9 +160,12 @@ impl Class for JsImage {
     }
 }
 
+use std::collections::HashMap;
+
 pub fn register_fns_and_types(
     script_env: &mut JsEnv,
-    graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>
+    graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>,
+    watches: &Rc<RefCell<HashMap<PathBuf, JsFunction>>>
 ) {
     let console = Console::init(&mut script_env.context);
     script_env.context.register_global_property(Console::NAME, console, Attribute::all())
@@ -315,5 +320,35 @@ pub fn register_fns_and_types(
                 Ok(JsValue::Undefined)
             })
         ).unwrap();
-    }        
+    }
+    
+    let _watches = watches.clone();
+    unsafe {
+        script_env.context.register_global_callable(
+            "watch_json",
+            2,
+            NativeFunction::from_closure(move |_this, args, context| {
+                if args.len() < 2 {
+                    return Err(JsNativeError::typ().with_message("Not enough arguments").into());
+                }
+                
+                let app_path = context.global_object().get("app_path", context)?
+                    .try_js_into::<String>(context)?;
+                let mut full_path = PathBuf::from(app_path);
+                
+                let path = args[0].try_js_into::<String>(context)?;
+                full_path.push(path);
+                let canonical_path = fs::canonicalize(&full_path).unwrap();
+                
+                let callback = args[1].try_js_into::<JsFunction>(context)?;
+
+                // todo Keeping the callback outside the JsEnv seems to cause core dump on quit
+                _watches.borrow_mut().insert(canonical_path, callback);
+
+                let json_text = read_to_string(&full_path).unwrap_or("{}".to_owned());
+                let json_data: serde_json::Value = serde_json::from_str(&json_text).unwrap();
+                Ok(JsValue::from_json(&json_data, context)?)
+            })
+        ).unwrap();
+    }
 }

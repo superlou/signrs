@@ -7,6 +7,9 @@ use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::{Instant, Duration};
 
+use boa_engine::Context;
+use boa_engine::JsValue;
+use boa_engine::object::builtins::JsFunction;
 use notify::{Watcher, RecursiveMode};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::shape::Rectangle;
@@ -45,8 +48,8 @@ pub struct SignWindowHandler {
     draw_offset: Vec2,
     pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
-    // #[allow(deprecated)]
-    // watches: Rc<RefCell<HashMap<PathBuf, (NativeCallContextStore, FnPtr)>>>,
+    #[allow(deprecated)]
+    watches: Rc<RefCell<HashMap<PathBuf, JsFunction>>>,
     
     #[allow(dead_code)] // Required to keep watcher in scope
     watcher: Box<dyn Watcher>,
@@ -80,18 +83,26 @@ impl WindowHandler<String> for SignWindowHandler {
         
         for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
             // Check if it's a watched file with a callback
-            // if let Some((context_store, fn_ptr)) = self.watches.borrow().get(&changed_path_buf) {
-            //     match self.script_env.parse_json_file(&changed_path_buf) {
-            //         Ok(json_data) => {
-            //             let _ = self.script_env.call_fn_ptr_bound(
-            //                 context_store,
-            //                 fn_ptr,
-            //                 [Dynamic::from_map(json_data)]
-            //             ).unwrap();
-            //         },
-            //         Err(e) => {println!("{}", e);},
-            //     };
-            // }
+            if let Some(js_fn) = self.watches.borrow().get(&changed_path_buf) {
+                // match self.script_env.parse_json_file(&changed_path_buf) {
+                //     Ok(json_data) => {
+                //         let _ = self.script_env.call_fn_ptr_bound(
+                //             context_store,
+                //             fn_ptr,
+                //             [Dynamic::from_map(json_data)]
+                //         ).unwrap();
+                //     },
+                //     Err(e) => {println!("{}", e);},
+                // };
+                
+                let json_text = read_to_string(&changed_path_buf).unwrap_or("{}".to_owned());
+                let json_data: serde_json::Value = serde_json::from_str(&json_text).unwrap();
+                js_fn.call(
+                    &JsValue::Undefined,
+                    &[JsValue::from_json(&json_data, &mut self.script_env.context).unwrap()],
+                    &mut self.script_env.context
+                );
+            }
             
             // If not explicitly watched, do other updates
             let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());            
@@ -111,7 +122,7 @@ impl WindowHandler<String> for SignWindowHandler {
                 &mut script_env,
                 &self.graphics_calls,
                 // &handler.root_path,
-                // &handler.watches,
+                &self.watches,
             );
             
             match script_env.call_init() {
@@ -232,7 +243,7 @@ impl SignWindowHandler {
             draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
-            // watches: Rc::new(RefCell::new(HashMap::new())),
+            watches: Rc::new(RefCell::new(HashMap::new())),
             watcher: Box::new(watcher),
             file_change_tx: tx,
             file_change_rx: rx,
@@ -242,7 +253,7 @@ impl SignWindowHandler {
             &mut handler.script_env,
             &handler.graphics_calls,
             // &handler.root_path,
-            // &handler.watches,
+            &handler.watches,
         );
         
         if let Err(err) = handler.script_env.call_init() {
