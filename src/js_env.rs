@@ -204,21 +204,24 @@ pub fn register_fns_and_types(
             "draw_rectangle",
             1,
             NativeFunction::from_closure(move |_this, args, context| {
-                if args.len() >= 5 {
-                    let x = args[0].try_js_into::<f64>(context)? as f32;
-                    let y = args[1].try_js_into::<f64>(context)? as f32;
-                    let w = args[2].try_js_into::<f64>(context)? as f32;
-                    let h = args[3].try_js_into::<f64>(context)? as f32;
-
-                    let c = args[4].as_object()
-                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
-                        .downcast_ref::<JsColor>()
-                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
-                        .clone();
-
-                    let r = Rectangle::from_tuples((x, y), (x + w, y + h));
-                    graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c.into()));
+                if args.len() < 5 {
+                    return Err(JsNativeError::typ().with_message("Too few arguments for draw_rectangle").into());
                 }
+
+                let x = args[0].try_js_into::<f64>(context)? as f32;
+                let y = args[1].try_js_into::<f64>(context)? as f32;
+                let w = args[2].try_js_into::<f64>(context)? as f32;
+                let h = args[3].try_js_into::<f64>(context)? as f32;
+
+                let c = args[4].as_object()
+                    .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                    .downcast_ref::<JsColor>()
+                    .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                    .clone();
+
+                let r = Rectangle::from_tuples((x, y), (x + w, y + h));
+                graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c.into()));
+
                 Ok(JsValue::Undefined)
             })
         ).unwrap();
@@ -230,29 +233,32 @@ pub fn register_fns_and_types(
             "draw_text",
             1,
             NativeFunction::from_closure(move |_this, args, context| {
-                if args.len() >= 5 {
-                    let js_font = args[0].as_object()
-                        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
-                        .downcast_ref::<JsFont>()
-                        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
-                        .clone();
-                        
-                    let text = args[1].try_js_into::<String>(context)?;
-                    
-                    let x = args[2].try_js_into::<f64>(context)? as f32;
-                    let y = args[3].try_js_into::<f64>(context)? as f32;                    
-
-                    let c = args[4].as_object()
-                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
-                        .downcast_ref::<JsColor>()
-                        .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
-                        .clone();                    
-                                                            
-                    let block = js_font.font.layout_text(&text, 18., TextOptions::new());
-                    graphics_calls_.borrow_mut().push(
-                        GraphicsCalls::DrawText((x, y).into(), c.into(), block)
-                    );
+                if args.len() < 5 {
+                    return Err(JsNativeError::typ().with_message("Too few arguments for draw_test").into());
                 }
+
+                let js_font = args[0].as_object()
+                    .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
+                    .downcast_ref::<JsFont>()
+                    .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
+                    .clone();
+                    
+                let text = args[1].try_js_into::<String>(context)?;
+                
+                let x = args[2].try_js_into::<f64>(context)? as f32;
+                let y = args[3].try_js_into::<f64>(context)? as f32;                    
+
+                let c = args[4].as_object()
+                    .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                    .downcast_ref::<JsColor>()
+                    .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
+                    .clone();                    
+                                                        
+                let block = js_font.font.layout_text(&text, 18., TextOptions::new());
+                graphics_calls_.borrow_mut().push(
+                    GraphicsCalls::DrawText((x, y).into(), c.into(), block)
+                );
+
                 Ok(JsValue::Undefined)
             })
         ).unwrap();
@@ -302,13 +308,13 @@ pub fn register_fns_and_types(
                         .downcast_ref::<JsImage>()
                         .ok_or(JsNativeError::typ().with_message("Expected a Image"))?
                         .clone();
-                    
+
                     let x = args[1].try_js_into::<f64>(context)? as f32;
                     let y = args[2].try_js_into::<f64>(context)? as f32;
                     let w = args[3].try_js_into::<f64>(context)? as f32;
                     let h = args[4].try_js_into::<f64>(context)? as f32;
-                    let a = args[5].try_js_into::<f64>(context)? as f32;                                                            
-                                                            
+                    let a = args[5].try_js_into::<f64>(context)? as f32;
+
                     graphics_calls_.borrow_mut().push(
                         GraphicsCalls::DrawRectangleImageTinted(
                             Rectangle::new((x, y).into(), (x + w, y + h).into()),
@@ -316,12 +322,14 @@ pub fn register_fns_and_types(
                             Color::from_rgba(1., 1., 1., a),
                         )
                     );
-                }                     
+                } else {
+                    return Err(JsNativeError::typ().with_message("Unexpected number of arguments for draw_image").into());
+                }
                 Ok(JsValue::Undefined)
             })
         ).unwrap();
     }
-    
+
     let _watches = watches.clone();
     unsafe {
         script_env.context.register_global_callable(
