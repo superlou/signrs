@@ -335,6 +335,30 @@ pub fn register_fns_and_types(
             })
         ).unwrap();
     }
+    
+let graphics_calls_ = graphics_calls.clone();
+    unsafe {
+        script_env.context.register_global_callable(
+            "with_offset",
+            1,
+            NativeFunction::from_closure(move |this, args, context| {
+                if args.len() < 3 {
+                    return Err(JsNativeError::typ().with_message("Too few arguments for with_offset").into());
+                }
+                
+                let x = args[0].try_js_into::<f64>(context)? as f32;
+                let y = args[1].try_js_into::<f64>(context)? as f32;                
+                let func = args[2].try_js_into::<JsFunction>(context)?;
+                
+                graphics_calls_.borrow_mut().push(
+                    GraphicsCalls::PushOffset((x, y).into())
+                );
+                func.call(this, args, context)?;
+                graphics_calls_.borrow_mut().push(GraphicsCalls::PopOffset());                
+                Ok(JsValue::Undefined)
+            })
+        ).unwrap();
+    }    
 
     let _watches = watches.clone();
     unsafe {

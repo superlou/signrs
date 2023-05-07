@@ -62,10 +62,11 @@ function draw(dt) {
     blue
   );
   
-  draw_text(font, `FPS: ${fps.toFixed(2)}`, 500, 10, white);
-  let now = new Date();
-  draw_text(font, fmt_clock(now), 500, 30, white);
-  
+  with_offset(500, 10, () => {
+      draw_text(font, `FPS: ${fps.toFixed(2)}`, 0, 0, white);
+      draw_text(font, fmt_clock(new Date()), 0, 20, white);
+  });
+
   draw_image(seahorse, 300, 100, 207, 212, 0.5 + 0.5 * Math.sin(2 * t));
   
   data.items.forEach((element, i) => {
