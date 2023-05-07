@@ -6,9 +6,8 @@ use speedy2d::window::{WindowCreationOptions, WindowSize};
 mod server;
 mod iter_util;
 mod window_handler;
-// mod script_env;
-// mod rhai_modules;
 mod js_env;
+mod js_draw;
 use window_handler::SignWindowHandler;
 
 fn main() { 

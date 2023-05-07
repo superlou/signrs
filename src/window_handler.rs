@@ -1,13 +1,11 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fs::{self, read_to_string};
 use std::sync::mpsc;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::{Instant, Duration};
 
-use boa_engine::Context;
 use boa_engine::JsValue;
 use boa_engine::object::builtins::JsFunction;
 use notify::{Watcher, RecursiveMode};
@@ -19,13 +17,13 @@ use speedy2d::window::{
 };
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
-use speedy2d::font::{Font, TextLayout, TextOptions, FormattedTextBlock};
+use speedy2d::font::FormattedTextBlock;
 use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
 use crate::iter_util::iter_unique;
-use crate::js_env;
 use crate::js_env::JsEnv;
+use crate::js_draw;
 
 #[derive(Error, Debug)]
 enum SignError {
@@ -108,10 +106,9 @@ impl WindowHandler<String> for SignWindowHandler {
             let root_path = self.root_path.lock().unwrap().clone();
             let mut script_env = JsEnv::new(&root_path);
             
-            js_env::register_fns_and_types(
+            js_draw::register_fns_and_types(
                 &mut script_env,
                 &self.graphics_calls,
-                // &handler.root_path,
                 &self.watches,
             );
             
@@ -239,7 +236,7 @@ impl SignWindowHandler {
             file_change_rx: rx,
         };
         
-        crate::js_env::register_fns_and_types(
+        js_draw::register_fns_and_types(
             &mut handler.script_env,
             &handler.graphics_calls,
             // &handler.root_path,
@@ -253,96 +250,6 @@ impl SignWindowHandler {
 
         handler
     }
-    
-    // fn register_fns_and_types(
-    //     script_env: &mut ScriptEnv,
-    //     graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>,
-    //     root_path: &Arc<Mutex<PathBuf>>,
-    //     watches: &Rc<RefCell<HashMap<PathBuf, (NativeCallContextStore, FnPtr)>>>,
-    // ) {
-    //     let graphics_calls_ = graphics_calls.clone();       
-    //     script_env.register_fn("clear_screen", move |c: Color| {
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::ClearScreen(c));
-    //     });
-        
-    //     let graphics_calls_ = graphics_calls.clone();        
-    //     script_env.register_fn("draw_rectangle", move |ulx: f32, uly: f32, llx: f32, lly: f32, c: Color| {
-    //        let r = Rectangle::from_tuples((ulx, uly), (llx, lly));         
-    //        graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangle(r, c));
-    //     });
-        
-    //     let graphics_calls_ = graphics_calls.clone();
-    //     script_env.register_fn("draw_text", move |text: &str, font: Font, scale: f32, color: Color, x: f32, y: f32| {
-    //         let block = font.layout_text(text, scale, TextOptions::new());
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::DrawText((x, y).into(), color, block));
-    //     });
-    
-    //     script_env.register_type::<Color>("Color")
-    //         .register_fn("new_color_from_rgb", Color::from_rgb);
-
-    //     script_env.register_type::<Color>("Color")
-    //         .register_fn("new_color_from_rgba", Color::from_rgba);
-        
-    //     let root_path_ = root_path.clone();
-    //     script_env.register_type::<Font>("Font")
-    //         .register_fn("new_font", move |font_path: &str| {
-    //             let mut full_path = root_path_.lock().unwrap().clone();
-    //             full_path.push(font_path);
-    //             let bytes = std::fs::read(full_path.as_path()).unwrap();
-    //             let font = Font::new(&bytes).unwrap();
-    //             font
-    //     });
-       
-    //     script_env.register_fn("new_image", move |path_string: &str| {
-    //         path_string.to_owned()
-    //     });
-        
-    //     let graphics_calls_ = graphics_calls.clone();
-    //     script_env.register_fn("draw_image", move |path_string: &str, x: f32, y: f32| {
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::DrawImage((x, y).into(), path_string.to_owned()));
-    //     });
-
-    //     let graphics_calls_ = graphics_calls.clone();
-    //     script_env.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32| {
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangleImageTinted(
-    //             Rectangle::new((x, y).into(), (x + w, y + h).into()),
-    //             path_string.to_owned(),
-    //             Color::WHITE,
-    //         ));
-    //     });
-        
-    //     let graphics_calls_ = graphics_calls.clone();
-    //     script_env.register_fn("draw_image", move |path_string: &str, x: f32, y: f32, w: f32, h: f32, alpha: f32| {
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::DrawRectangleImageTinted(
-    //             Rectangle::new((x, y).into(), (x + w, y + h).into()),
-    //             path_string.to_owned(),
-    //             Color::from_rgba(1.0, 1.0, 1.0, alpha),
-    //         ));
-    //     });
-        
-    //     let graphics_calls_ = graphics_calls.clone();
-    //     script_env.register_fn("push_offset", move |x: f32, y: f32| {
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::PushOffset((x, y).into()));
-    //     });
-        
-    //     let graphics_calls_ = graphics_calls.clone();        
-    //     script_env.register_fn("pop_offset", move || {
-    //         graphics_calls_.borrow_mut().push(GraphicsCalls::PopOffset());
-    //     });        
-        
-    //     let root_path_ = root_path.clone();
-    //     let watches_ = watches.clone();
-    //     script_env.register_fn("watch_json", move |context: NativeCallContext, path_string: &str, fn_ptr: FnPtr| {
-    //         let mut json_path = root_path_.lock().unwrap().clone();
-    //         json_path.push(path_string);
-    //         let canonical_path = fs::canonicalize(&json_path).unwrap();
-    //         #[allow(deprecated)]
-    //         watches_.borrow_mut().insert(canonical_path.clone(), (context.store_data(), fn_ptr.clone()));
-            
-    //         let json_text = read_to_string(&json_path).unwrap_or("#{}".to_owned());
-    //         Engine::new_raw().parse_json(json_text, true)
-    //     });         
-    // }
     
     pub fn get_resolution(&self) -> Option<(u32, u32)> {
         // match self.script_env.get_state_value("resolution").unwrap().into_array() {
