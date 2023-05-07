@@ -62,6 +62,12 @@ impl JsEnv {
         )?;
         Ok(())
     }
+    
+    pub fn load_json(path: impl AsRef<Path>, context: &mut Context) -> Result<JsValue, JsError> {
+        let json_text = read_to_string(path).unwrap_or("{}".to_owned());
+        let Ok(json_data) = serde_json::from_str(&json_text) else {return Ok(JsValue::Undefined)};
+        JsValue::from_json(&json_data, context)
+    }
 }
 
 use speedy2d::color::Color;
@@ -346,16 +352,13 @@ pub fn register_fns_and_types(
                 
                 let path = args[0].try_js_into::<String>(context)?;
                 full_path.push(path);
-                let canonical_path = fs::canonicalize(&full_path).unwrap();
                 
+                let Ok(canonical_path) = fs::canonicalize(&full_path) else {return Ok(JsValue::Undefined)};
                 let callback = args[1].try_js_into::<JsFunction>(context)?;
-
                 // todo Keeping the callback outside the JsEnv seems to cause core dump on quit
                 _watches.borrow_mut().insert(canonical_path, callback);
-
-                let json_text = read_to_string(&full_path).unwrap_or("{}".to_owned());
-                let json_data: serde_json::Value = serde_json::from_str(&json_text).unwrap();
-                Ok(JsValue::from_json(&json_data, context)?)
+                
+                Ok(JsEnv::load_json(&full_path, context)?)
             })
         ).unwrap();
     }

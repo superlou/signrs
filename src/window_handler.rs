@@ -83,25 +83,15 @@ impl WindowHandler<String> for SignWindowHandler {
         
         for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
             // Check if it's a watched file with a callback
-            if let Some(js_fn) = self.watches.borrow().get(&changed_path_buf) {
-                // match self.script_env.parse_json_file(&changed_path_buf) {
-                //     Ok(json_data) => {
-                //         let _ = self.script_env.call_fn_ptr_bound(
-                //             context_store,
-                //             fn_ptr,
-                //             [Dynamic::from_map(json_data)]
-                //         ).unwrap();
-                //     },
-                //     Err(e) => {println!("{}", e);},
-                // };
-                
-                let json_text = read_to_string(&changed_path_buf).unwrap_or("{}".to_owned());
-                let json_data: serde_json::Value = serde_json::from_str(&json_text).unwrap();
-                js_fn.call(
-                    &JsValue::Undefined,
-                    &[JsValue::from_json(&json_data, &mut self.script_env.context).unwrap()],
-                    &mut self.script_env.context
-                );
+            if let Some(js_fn) = self.watches.borrow().get(&changed_path_buf) {               
+                match JsEnv::load_json(&changed_path_buf, &mut self.script_env.context) {
+                    Ok(data) => {
+                        if let Err(err) = js_fn.call(&JsValue::Undefined, &[data], &mut self.script_env.context) {
+                            dbg!(&err);
+                        }
+                    },
+                    Err(err) => {dbg!(&err);},
+                }
             }
             
             // If not explicitly watched, do other updates
