@@ -1,7 +1,4 @@
-function init() {
-  let a = 3;
-  a += 5;
-}
+function init() { }
 
 let black = new Color(0.0, 0.0, 0.0);
 let green = new Color(0.0, 1.0, 0.0, 0.8);
@@ -19,6 +16,28 @@ let data;
 data = watch_json("text.json", (new_data) => {
   data = new_data;
 });
+
+function fmt_clock(date) {
+  let h = date.getHours();
+  let m = date.getMinutes();
+  let s = date.getSeconds();
+  let ampm = "am";
+  
+  if (h === 0) {
+    h = 12;
+  } else if (h === 12) {
+    ampm = "pm"
+  } else if (h > 12) {
+    h -= 12;
+    ampm = "pm";
+  }
+  
+  let h_str = h.toString().padStart(2);
+  let m_str = m.toString().padStart(2, "0");
+  let s_str = s.toString().padStart(2, "0");
+  
+  return `${h_str}:${m_str}:${s_str} ${ampm}`;
+}
 
 function draw(dt) {
   t += dt;
@@ -43,7 +62,9 @@ function draw(dt) {
     blue
   );
   
-  draw_text(font, `FPS: ${fps.toFixed(2)}`, 550, 10, white);
+  draw_text(font, `FPS: ${fps.toFixed(2)}`, 500, 10, white);
+  let now = new Date();
+  draw_text(font, fmt_clock(now), 500, 30, white);
   
   draw_image(seahorse, 300, 100, 207, 212, 0.5 + 0.5 * Math.sin(2 * t));
   
