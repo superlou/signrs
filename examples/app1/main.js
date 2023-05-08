@@ -1,4 +1,5 @@
-function init() { }
+var resolution = [1280, 720];
+var multisampling = 1;
 
 let black = new Color(0.0, 0.0, 0.0);
 let green = new Color(0.0, 1.0, 0.0, 0.8);
@@ -39,13 +40,15 @@ function fmt_clock(date) {
   return `${h_str}:${m_str}:${s_str} ${ampm}`;
 }
 
+function init() { }
+
 function draw(dt) {
   t += dt;
   let fps = 0.1 * (1 / dt) + 0.9 * prev_fps;
   prev_fps = fps;
   clear_screen(black);
   
-  draw_image(background, 0, 0, 640, 480);  
+  draw_image(background, 0, 0, resolution[0], resolution[1]);  
   
   draw_rectangle(
     40.0 + 50 * Math.cos(t), 40.0 + 20 * Math.sin(2*t),
@@ -62,12 +65,12 @@ function draw(dt) {
     blue
   );
   
-  with_offset(500, 10, () => {
+  with_offset(1100, 40, () => {
       draw_text(font, `FPS: ${fps.toFixed(2)}`, 0, 0, white);
       draw_text(font, fmt_clock(new Date()), 0, 20, white);
   });
 
-  draw_image(seahorse, 300, 100, 207, 212, 0.5 + 0.5 * Math.sin(2 * t));
+  draw_image(seahorse, 600, 300, 207, 212, 0.5 + 0.5 * Math.sin(2 * t));
   
   data.items.forEach((element, i) => {
     draw_text(font, element, 100, 350 + 18 * i, white);

@@ -2,11 +2,14 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::path::Path;
 
+use boa_engine::object::builtins::JsArray;
+use boa_engine::property::PropertyKey;
+use boa_engine::value::TryFromJs;
 use boa_engine::{Context, JsValue, Source, JsError};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum ScriptError {
+pub enum JsEnvError {
     #[error("EvalAltError: {0}")]
     EvalAltError(#[from] JsError),
 }
@@ -54,6 +57,38 @@ impl JsEnv {
         Ok(())
     }
     
+    pub fn get_global<T, K>(&mut self, key: K) -> Result<T, JsError>
+        where K: Into<PropertyKey>,
+              T: TryFromJs
+    {       
+        let value = self.context.global_object()
+            .get(key, &mut self.context)?
+            .try_js_into::<T>(&mut self.context)?;
+        
+        Ok(value)
+    }
+
+    pub fn get_global_array<T, K>(&mut self, key: K) -> Result<Vec<T>, JsError>
+        where K: Into<PropertyKey>,
+              T: TryFromJs
+    {       
+        let value = self.context.global_object()
+            .get(key, &mut self.context)?
+            .try_js_into::<JsArray>(&mut self.context)?;
+        
+        let length = value.length(&mut self.context)? as i64;
+        let mut vec: Vec<T> = vec![];
+        
+        for i in 0..length {
+            vec.push(
+                value.at(i, &mut self.context)?
+                    .try_js_into::<T>(&mut self.context)?
+                )
+        }
+
+        Ok(vec)
+    }
+            
     pub fn load_json(path: impl AsRef<Path>, context: &mut Context) -> Result<JsValue, JsError> {
         let json_text = read_to_string(path).unwrap_or("{}".to_owned());
         let Ok(json_data) = serde_json::from_str(&json_text) else {return Ok(JsValue::Undefined)};

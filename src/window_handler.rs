@@ -251,27 +251,18 @@ impl SignWindowHandler {
         handler
     }
     
-    pub fn get_resolution(&self) -> Option<(u32, u32)> {
-        // match self.script_env.get_state_value("resolution").unwrap().into_array() {
-        //     Ok(a) => {
-        //         match (a[0].clone().try_cast::<i64>(), a[1].clone().try_cast::<i64>()) {
-        //             (Some(x), Some(y)) => Some((x as u32, y as u32)),
-        //             _ => None,
-        //         }
-        //     },
-        //     Err(_) => None
-        // }
-        
-        Some((640, 480))
+    pub fn get_resolution(&mut self) -> Option<(u32, u32)> {
+        match self.script_env.get_global_array::<u32, _>("resolution") {
+            Ok(a) if a.len() >= 2 => Some((a[0], a[1])),
+            _ => None,
+        }
     }
     
-    pub fn get_multisampling(&self) -> Option<u16> {
-        // match self.script_env.get_state_value("multisampling").unwrap().as_int() {
-        //     Ok(m) => u16::try_from(m).ok(),
-        //     Err(_) => None,
-        // }
-        
-        Some(1)
+    pub fn get_multisampling(&mut self) -> Option<u16> {
+        match self.script_env.get_global::<i32, _>("multisampling") {
+            Ok(value) => Some(value as u16),
+            Err(_) => None,
+        }
     }
     
     fn get_image_handle(&mut self, path_string: &str, graphics: &mut Graphics2D) -> ImageHandle {
