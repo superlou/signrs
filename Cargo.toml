@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 speedy2d = {git = "https://github.com/superlou/Speedy2D.git"}
-rhai = {version = "1.13", features = ["f32_float", "internals"]}
 boa_engine = {git = "https://github.com/boa-dev/boa.git"}
 boa_gc = {git = "https://github.com/boa-dev/boa.git"}
 boa_runtime = {git = "https://github.com/boa-dev/boa.git"}
