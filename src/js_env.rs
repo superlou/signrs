@@ -2,6 +2,9 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::path::Path;
 
+use boa_engine::JsNativeError;
+use boa_engine::JsResult;
+use boa_engine::NativeFunction;
 use boa_engine::object::builtins::JsArray;
 use boa_engine::property::PropertyKey;
 use boa_engine::value::TryFromJs;
@@ -25,6 +28,14 @@ impl JsEnv {
         
         let app_path_str = app_path.to_str().unwrap();      
         context.global_object().set("app_path", app_path_str, true, &mut context).unwrap();
+        
+        unsafe {
+            context.register_global_callable(
+                "include", 1, NativeFunction::from_closure(move |this, args, context| {
+                    include_js(this, args, context)
+                })
+            ).unwrap();
+        }
         
         JsEnv {
             context,
@@ -94,4 +105,26 @@ impl JsEnv {
         let Ok(json_data) = serde_json::from_str(&json_text) else {return Ok(JsValue::Undefined)};
         JsValue::from_json(&json_data, context)
     }
+}
+
+fn include_js(_this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
+    if args.len() < 1 {
+        return Err(JsNativeError::typ().with_message("Too few arguments for include").into())
+    }
+    
+    let file_path = args[0].try_js_into::<String>(context)?;
+    
+    let app_path = context.global_object()
+        .get("app_path", context)?
+        .try_js_into::<String>(context)?;
+    let mut full_path = PathBuf::from(app_path);
+    full_path.push(&file_path);
+    
+    let src = Source::from_filepath(&full_path).map_err(|_| {
+        JsNativeError::typ().with_message(format!("Unable to include source: {}", &file_path))}
+    )?;
+    
+    context.eval_script(src)?;
+    
+    Ok(JsValue::Undefined)
 }
