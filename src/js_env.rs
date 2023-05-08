@@ -29,13 +29,11 @@ impl JsEnv {
         let app_path_str = app_path.to_str().unwrap();      
         context.global_object().set("app_path", app_path_str, true, &mut context).unwrap();
         
-        unsafe {
-            context.register_global_callable(
-                "include", 1, NativeFunction::from_closure(move |this, args, context| {
-                    include_js(this, args, context)
-                })
-            ).unwrap();
-        }
+        context.register_global_callable(
+            "include", 1, NativeFunction::from_copy_closure(move |this, args, context| {
+                include_js(this, args, context)
+            })
+        ).unwrap();
         
         JsEnv {
             context,
