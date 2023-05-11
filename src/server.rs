@@ -14,6 +14,16 @@ struct StatusResponse {
     is_fullscreen: bool,
 }
 
+trait ResponseHelpers {
+    fn allow_cors(self) -> Self;
+}
+
+impl ResponseHelpers for Response {
+    fn allow_cors(self) -> Self {
+        self.with_additional_header("Access-Control-Allow-Origin", "*")
+    }
+}
+
 pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<String>>) {
     let path = handler.root_path.clone();
     let is_fullscreen = handler.is_fullscreen.clone();
@@ -32,7 +42,7 @@ pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<S
                       is_fullscreen: *is_fullscreen.lock().unwrap(),
                     };
                     
-                    Response::json(&data)
+                    Response::json(&data).allow_cors()
                 },
                 (GET) (/api/test_sender) => {
                     sender.lock().unwrap().send_event("Test".to_owned()).unwrap();
