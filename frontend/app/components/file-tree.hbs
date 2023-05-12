@@ -1,0 +1,7 @@
+<h1>File Tree</h1>
+
+<ul>
+{{#each @paths as |path|}}
+  <li><a href="#" {{action (fn @selectFile path)}}>{{path}}</a></li>
+{{/each}}
+</ul>

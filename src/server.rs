@@ -1,10 +1,12 @@
-use std::path::PathBuf;
+use std::fs::read_to_string;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::thread;
 
 use rouille::{Response, router};
 use serde::Serialize;
 use speedy2d::window::UserEventSender;
+use walkdir::WalkDir;
 
 use crate::window_handler::SignWindowHandler;
 
@@ -24,6 +26,48 @@ impl ResponseHelpers for Response {
     }
 }
 
+fn get_dir_contents(path: impl AsRef<Path>) -> Vec<String> {
+    WalkDir::new(path)
+        .into_iter()
+        .map(|entry| entry.unwrap().path().to_str().unwrap().to_owned())
+        .collect()
+}
+
+#[derive(Serialize)]
+struct DirData {
+    kind: String,
+    contents: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct FileData {
+    kind: String, 
+    content: String,
+}
+
+#[derive(Serialize)]
+struct PathNotFound {
+    kind: String,
+}
+
+fn make_fs_response(path: &Path) -> Response {
+    if path.is_dir() {
+        Response::json(&DirData {
+            kind: "dir".to_owned(),
+            contents: get_dir_contents(path),
+        })
+    } else if path.is_file() {
+        Response::json(&FileData {
+            kind: "file".to_owned(),
+            content: read_to_string(path).unwrap_or("".to_owned()),
+        })
+    } else {
+        Response::json(&PathNotFound {
+            kind: "unknown".to_owned(),
+        })
+    }
+}
+
 pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<String>>) {
     let path = handler.root_path.clone();
     let is_fullscreen = handler.is_fullscreen.clone();
@@ -35,14 +79,20 @@ pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<S
                 return response;
             }
             
-            router!(request, 
+            if let Some(request) = request.remove_prefix("/api/fs/") {
+                let mut path = path.lock().unwrap().to_owned();
+                path.push(request.url());
+                return make_fs_response(&path).allow_cors();
+            }
+            
+            let response = router!(request, 
                 (GET) (/api/status) => {
                     let data = StatusResponse {
                       root_path: path.lock().unwrap().to_owned(),
                       is_fullscreen: *is_fullscreen.lock().unwrap(),
                     };
                     
-                    Response::json(&data).allow_cors()
+                    Response::json(&data)
                 },
                 (GET) (/api/test_sender) => {
                     sender.lock().unwrap().send_event("Test".to_owned()).unwrap();
@@ -51,7 +101,9 @@ pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<S
                 _ => {
                     Response::text("Unknown route!")
                 },
-            )
+            );
+            
+            response.allow_cors()
         });
     });
 }

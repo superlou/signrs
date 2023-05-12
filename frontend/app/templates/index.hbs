@@ -2,3 +2,8 @@
 
 <h1>Status</h1>
 <SignStatus/>
+
+<FileTree @paths={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
+
+{{this.edit}}
+<SourceEditor @source={{this.source}}/>

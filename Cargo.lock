@@ -2111,6 +2111,7 @@ dependencies = [
  "serde_json",
  "speedy2d",
  "thiserror",
+ "walkdir",
 ]
 
 [[package]]
