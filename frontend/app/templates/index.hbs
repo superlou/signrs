@@ -2,7 +2,4 @@
 
 <h1>Status</h1>
 <SignStatus/>
-
-<FileTree @paths={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
-
-<SourceEditor @filename={{this.edit}} @source={{this.source}}/>
+<LinkTo @route={{"editor"}}>Editor</LinkTo>

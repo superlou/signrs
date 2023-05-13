@@ -1,0 +1,15 @@
+{{page-title "Editor"}}
+
+<LinkTo @route="index">Index</LinkTo>
+<h1>App Editor <small>{{this.signServer.appPath}}</small></h1>
+
+<div class="editor-container">
+  <div class="panel-left">
+    <FileTree @paths={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
+  </div>
+  <div class="content">
+    {{#if this.edit}}
+      <SourceEditor @filename={{this.edit}} @source={{this.source}}/>
+    {{/if}}
+  </div>
+</div>

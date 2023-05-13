@@ -8,26 +8,25 @@ import { json } from '@codemirror/lang-json';
 
 export default class LoadCodemirrorModifier extends Modifier {
   editorView = null;
-  
+
   modify(element, positional /*, named*/) {
     let source = positional[0];
     let filename = positional[1];
 
     let extensions = [basicSetup];
-    
-    if (filename.endsWith(".js")) {
+
+    if (filename.endsWith('.js')) {
       extensions.push(javascript());
-    } else if (filename.endsWith(".json")) {
+    } else if (filename.endsWith('.json')) {
       extensions.push(json());
     }
-    
+
     let state = EditorState.create({
       doc: source,
       extensions: extensions,
     });
-    
+
     if (this.editorView === null) {
-      console.log("setup");
       this.editorView = new EditorView({
         parent: element,
         state: state,

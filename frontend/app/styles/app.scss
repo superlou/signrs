@@ -1,0 +1,24 @@
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+.cm-gutters {
+  border-left : 1px solid #ddd;
+}
+
+.editor-container {
+  display: flex;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  
+  .panel-left {
+    width: 240px;
+    overflow: scroll;
+    margin: 0px 2px;
+  }
+  
+  .content {
+    width: 100%;
+  }
+}
