@@ -37,13 +37,13 @@ export default class SignServerService extends Service {
     await timeout(1000);
     this.getStatus.perform();
   });
-  
+
   async getSource(path) {
     let response = await fetch('http://localhost:3000/api/fs/' + path);
     let data = await response.json();
 
-    if (data.kind === "file") {
-      return data.content; 
+    if (data.kind === 'file') {
+      return data.content;
     }
   }
 }

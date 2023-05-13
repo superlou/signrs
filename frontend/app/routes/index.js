@@ -2,11 +2,11 @@ import Route from '@ember/routing/route';
 import { service } from '@ember/service';
 
 export default class IndexRoute extends Route {
-  @service signServer;  
-  
+  @service signServer;
+
   model(params) {
     return {
-      edit: params.edit
+      edit: params.edit,
     };
   }
 

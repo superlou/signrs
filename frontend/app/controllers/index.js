@@ -8,7 +8,7 @@ export default class IndexController extends Controller {
   @tracked edit = null;
 
   @service signServer;
-  
+
   @tracked source = null;
 
   @action
