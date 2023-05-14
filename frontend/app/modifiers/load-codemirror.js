@@ -1,8 +1,9 @@
 import Modifier from 'ember-modifier';
 import { registerDestructor } from '@ember/destroyable';
 import { basicSetup } from 'codemirror';
-import { EditorState } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
+import { EditorState, StateField } from '@codemirror/state';
+import { EditorView, keymap } from '@codemirror/view';
+import { standardKeymap } from '@codemirror/commands';
 import { javascript } from '@codemirror/lang-javascript';
 import { json } from '@codemirror/lang-json';
 
@@ -12,8 +13,22 @@ export default class LoadCodemirrorModifier extends Modifier {
   modify(element, positional /*, named*/) {
     let source = positional[0];
     let filename = positional[1];
+    let onSave = positional[2];
+    
+    let filenameField = StateField.define({
+      create: (state) => filename,
+      update: (value, transaction) => value,
+    });    
+    
+    let saveCommand = keymap.of([{
+      key: 'Ctrl-s',
+      run: (target) => {
+        onSave(target.state.doc.toString(), target.state.field(filenameField));
+        return true;
+      },
+    }]);
 
-    let extensions = [basicSetup];
+    let extensions = [basicSetup, saveCommand, filenameField];
 
     if (filename.endsWith('.js')) {
       extensions.push(javascript());

@@ -9,7 +9,7 @@
   </div>
   <div class="content">
     {{#if this.edit}}
-      <SourceEditor @filename={{this.edit}} @source={{this.source}}/>
+      <SourceEditor @filename={{this.edit}} @source={{this.source}} @onSave={{this.save}}/>
     {{/if}}
   </div>
 </div>

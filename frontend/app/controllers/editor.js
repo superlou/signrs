@@ -16,4 +16,10 @@ export default class EditorController extends Controller {
     this.edit = path;
     this.source = await this.signServer.getSource(path);
   }
+  
+  @action
+  async save(content, path) {
+    console.log(`Saving ${path}`);
+    await this.signServer.putSource(path, content);
+  }
 }

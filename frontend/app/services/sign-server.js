@@ -3,6 +3,8 @@ import { task, timeout } from 'ember-concurrency';
 import { tracked } from '@glimmer/tracking';
 
 export default class SignServerService extends Service {
+  API_ROOT = 'http://localhost:3000/api/';
+
   init() {
     super.init(...arguments);
     this.getStatus.perform();
@@ -14,7 +16,7 @@ export default class SignServerService extends Service {
 
   getStatus = task(async () => {
     try {
-      let response = await fetch('http://localhost:3000/api/status');
+      let response = await fetch(this.API_ROOT + 'status');
       let data = await response.json();
       this.appPath = data.root_path;
       this.fullScreen = data.is_fullscreen;
@@ -24,7 +26,7 @@ export default class SignServerService extends Service {
     }
 
     try {
-      let response = await fetch('http://localhost:3000/api/fs/');
+      let response = await fetch(this.API_ROOT + 'fs/');
       let data = await response.json();
       let items = data.items.map((item) => {
         item.name = item.name.replace(this.appPath + '/', '');
@@ -45,12 +47,19 @@ export default class SignServerService extends Service {
   });
 
   async getSource(path) {
-    let response = await fetch('http://localhost:3000/api/fs/' + path);
+    let response = await fetch(this.API_ROOT + 'fs/' + path);
     let data = await response.json();
 
     if (data.kind === 'file') {
       return data.content;
     }
+  }
+  
+  async putSource(path, content) {
+    let response = await fetch(this.API_ROOT + 'fs/' + path, {
+      method: "PUT",
+      body: content,
+    });
   }
 }
 

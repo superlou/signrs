@@ -1,9 +1,10 @@
 use std::fs::read_to_string;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::thread;
 
-use rouille::{Response, router};
+use rouille::{Response, router, Request, RequestBody};
 use serde::Serialize;
 use speedy2d::window::UserEventSender;
 use walkdir::WalkDir;
@@ -81,6 +82,13 @@ fn make_fs_response(path: &Path) -> Response {
     }
 }
 
+fn make_fs_put_response(path: &Path, request: &Request) -> Response {
+    let mut content = String::new();
+    request.data().unwrap().read_to_string(&mut content).unwrap();
+    std::fs::write(path, content).unwrap();
+    Response::text(format!("Updated {} successfully.", request.url()))
+}
+
 pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<String>>) {
     let path = handler.root_path.clone();
     let is_fullscreen = handler.is_fullscreen.clone();
@@ -93,9 +101,28 @@ pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<S
             }
             
             if let Some(request) = request.remove_prefix("/api/fs/") {
-                let mut path = path.lock().unwrap().to_owned();
-                path.push(request.url());
-                return make_fs_response(&path).allow_cors();
+                match request.method() {
+                    "GET" => {
+                        let mut path = path.lock().unwrap().to_owned();
+                        path.push(request.url());
+                        return make_fs_response(&path).allow_cors();
+                    },
+                    "OPTIONS" => {
+                        return Response::text("OPTIONS response")
+                            .with_additional_header("Access-Control-Allow-Methods", "OPTIONS, GET, PUT")
+                            .allow_cors();
+                    },
+                    "PUT" => {
+                        let mut path = path.lock().unwrap().to_owned();
+                        path.push(request.url());
+                        return make_fs_put_response(&path, &request).allow_cors();
+                    }
+                    _ => {
+                        return Response::text("Method not allowed")
+                            .with_status_code(405)
+                            .allow_cors();
+                    }
+                }
             }
             
             let response = router!(request, 
