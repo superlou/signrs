@@ -26,17 +26,30 @@ impl ResponseHelpers for Response {
     }
 }
 
-fn get_dir_contents(path: impl AsRef<Path>) -> Vec<String> {
+fn get_dir_contents(path: impl AsRef<Path>) -> Vec<DirItem> {
     WalkDir::new(path)
         .into_iter()
-        .map(|entry| entry.unwrap().path().to_str().unwrap().to_owned())
+        .map(|entry| {
+            let entry = entry.unwrap();
+            
+            DirItem {
+                name: entry.path().to_str().unwrap().to_owned(),
+                is_dir: entry.path().is_dir(),
+            }
+        })
         .collect()
+}
+
+#[derive(Serialize)]
+struct DirItem {
+    name: String,
+    is_dir: bool,
 }
 
 #[derive(Serialize)]
 struct DirData {
     kind: String,
-    contents: Vec<String>,
+    items: Vec<DirItem>,
 }
 
 #[derive(Serialize)]
@@ -54,7 +67,7 @@ fn make_fs_response(path: &Path) -> Response {
     if path.is_dir() {
         Response::json(&DirData {
             kind: "dir".to_owned(),
-            contents: get_dir_contents(path),
+            items: get_dir_contents(path),
         })
     } else if path.is_file() {
         Response::json(&FileData {

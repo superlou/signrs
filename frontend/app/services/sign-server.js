@@ -26,10 +26,16 @@ export default class SignServerService extends Service {
     try {
       let response = await fetch('http://localhost:3000/api/fs/');
       let data = await response.json();
-      let paths = data.contents.map((path) => {
-        return path.replace(this.appPath + '/', '');
+      let items = data.items.map((item) => {
+        item.name = item.name.replace(this.appPath + '/', '');
+        return item;
       });
-      this.fileList = paths;
+
+      items = items.filter((item) => item.name.length > 0);
+
+      if (!deepEqual(this.fileList, items)) {
+        this.fileList = items;
+      }
     } catch (error) {
       this.fileList = [];
     }
@@ -46,4 +52,44 @@ export default class SignServerService extends Service {
       return data.content;
     }
   }
+}
+
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+
+  a.sort();
+  b.sort();
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+
+  return true;
+}
+
+function deepEqual(object1, object2) {
+  const keys1 = Object.keys(object1);
+  const keys2 = Object.keys(object2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (const key of keys1) {
+    const val1 = object1[key];
+    const val2 = object2[key];
+    const areObjects = isObject(val1) && isObject(val2);
+    if (
+      areObjects && !deepEqual(val1, val2) ||
+      !areObjects && val1 !== val2
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isObject(object) {
+  return object != null && typeof object === 'object';
 }

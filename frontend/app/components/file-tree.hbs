@@ -1,5 +1,7 @@
-<ul>
-{{#each @paths as |path|}}
-  <li><a href="#" {{action (fn @selectFile path)}}>{{path}}</a></li>
-{{/each}}
-</ul>
+<div class="file-tree">
+  <ul>
+  {{#each this.fileTree.children as |item|}}
+    <FileTreeItem @item={{item}} @selectFile={{@selectFile}}/>
+  {{/each}}
+  </ul>
+</div>

@@ -1,6 +1,7 @@
 body {
   margin: 0px;
   padding: 0px;
+  font-family: sans-serif;
 }
 
 .cm-gutters {
@@ -20,5 +21,28 @@ body {
   
   .content {
     width: 100%;
+  }
+}
+
+.file-tree {
+  font-family: 0.8em;
+  
+  a, a:visited {
+    text-decoration: none;
+    color: black;
+  }
+  
+  ul {
+    padding-left: 18px;
+    list-style-type: none;
+  }
+   
+  & > ul {
+    padding-left: 0px;
+  }
+   
+  li {
+    white-space: nowrap;
+    padding: 2px 0px;
   }
 }

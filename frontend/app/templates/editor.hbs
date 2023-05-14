@@ -5,7 +5,7 @@
 
 <div class="editor-container">
   <div class="panel-left">
-    <FileTree @paths={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
+    <FileTree @items={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
   </div>
   <div class="content">
     {{#if this.edit}}

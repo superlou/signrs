@@ -1,0 +1,15 @@
+<li>
+  {{#if @item.isDir}}
+    <a href="#" {{action this.toggleExpanded}}><this.icon @size=16/> {{@item.name}}</a>
+  {{else}}
+    <a href="#" {{action (fn @selectFile @item.fullName)}}><this.icon @size=14/> {{@item.name}}</a>
+  {{/if}}
+
+  {{#if this.expanded}}
+    <ul>
+    {{#each @item.children as |item|}}
+      <FileTreeItem @item={{item}} @selectFile={{@selectFile}}/>
+    {{/each}}
+    </ul>
+  {{/if}}
+</li>
