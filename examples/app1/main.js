@@ -46,13 +46,13 @@ function draw(dt) {
   );
   
   with_offset(1100, 40, () => {
-      draw_text(font, `FPS: ${fps.toFixed(2)}`, 0, 0, white);
-      draw_text(font, fmt_clock(new Date()), 0, 20, white);
+      draw_text(font, `FPS: ${fps.toFixed(2)}`, 0, 0, 18, white);
+      draw_text(font, fmt_clock(new Date()), 0, 20, 18, white);
   });
 
   draw_image(seahorse, 600, 300, 207, 212, 0.5 + 0.5 * Math.sin(2 * t));
   
   data.items.forEach((element, i) => {
-    draw_text(font, element, 100, 350 + 18 * i, white);
+    draw_text(font, element, 100, 350 + 32 * i, 32, white);
   });
 }

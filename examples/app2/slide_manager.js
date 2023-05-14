@@ -12,8 +12,8 @@ class SlideManager {
         let body = this.slides[this.activeIndex].text;
         let duration = this.slides[this.activeIndex].duration;
         
-        draw_text(font.light, title, 20, 20, color.title);
-        draw_text(font.normal, body, 20, 50, color.body);
+        draw_text(font.light, title, 20, 24, 64, color.title);
+        draw_text(font.normal, body, 20, 96, 18, color.body);
         
         let w = this.timeRemaining / duration * 640;
         draw_rectangle(0, 0, 640, 4, color.black);

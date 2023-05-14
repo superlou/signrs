@@ -242,15 +242,17 @@ fn draw_text(
     let text = args[1].try_js_into::<String>(context)?;
     
     let x = args[2].try_js_into::<f64>(context)? as f32;
-    let y = args[3].try_js_into::<f64>(context)? as f32;                    
+    let y = args[3].try_js_into::<f64>(context)? as f32;
+    
+    let s = args[4].try_js_into::<f64>(context)? as f32;
 
-    let c = args[4].as_object()
+    let c = args[5].as_object()
         .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
         .downcast_ref::<JsColor>()
         .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
-        .clone();                    
+        .clone();
                                             
-    let block = js_font.font.layout_text(&text, 18., TextOptions::new());
+    let block = js_font.font.layout_text(&text, s, TextOptions::new());
     graphics_calls.borrow_mut().push(
         GraphicsCalls::DrawText((x, y).into(), c.into(), block)
     );
