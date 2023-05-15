@@ -363,7 +363,15 @@ fn watch_json(
     let Ok(canonical_path) = fs::canonicalize(&full_path) else {return Ok(JsValue::Undefined)};
     let callback = args[1].try_js_into::<JsFunction>(context)?;
     // todo Keeping the callback outside the JsEnv seems to cause core dump on quit
-    watches.borrow_mut().insert(canonical_path, callback);
+    watches.borrow_mut().insert(canonical_path, callback.clone());
+    
+    if args.len() > 2 {
+        let run_first = args[2].try_js_into::<bool>(context)?;
+        if run_first {
+            let data = JsEnv::load_json(&full_path, context)?;
+            callback.clone().call(&JsValue::Undefined, &[data], context)?;
+        }
+    }
     
     Ok(JsEnv::load_json(&full_path, context)?)
 }

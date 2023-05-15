@@ -1,13 +1,21 @@
 class SlideManager {
     slides = [];
     activeIndex = 0;
-    timeRemaining = 0;
+    timeRemaining = null;
     
     add(title, text, duration) {
         this.slides.push(new Slide(title, text, duration));    
     }
     
     draw(dt) {
+        if (this.slides.length == 0) {
+            return;
+        }
+        
+        if (this.timeRemaining === null) {
+            this.timeRemaining == this.slides[this.activeIndex].duration;
+        }
+        
         let title = this.slides[this.activeIndex].title;
         let body = this.slides[this.activeIndex].text;
         let duration = this.slides[this.activeIndex].duration;
@@ -25,6 +33,12 @@ class SlideManager {
             this.activeIndex = (this.activeIndex + 1) % this.slides.length;
             this.timeRemaining = this.slides[this.activeIndex].duration;
         }
+    }
+    
+    clear() {
+        this.slides = [];
+        this.activeIndex = 0;
+        this.timeRemaining = null;
     }
 }
 

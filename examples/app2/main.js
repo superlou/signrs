@@ -17,9 +17,13 @@ let font = {
 }
 
 let slideManager = newSlideManager();
-slideManager.add("Slide 1", "This is some text", 5);
-slideManager.add("Slide 2", "This is different text", 5);
-slideManager.add("Last Slide", "The very last slide has different text", 5);
+
+watch_json("slides.json", (data) => {
+    slideManager.clear();
+    data.forEach((slide) => {
+        slideManager.add(slide.title, slide.body, slide.duration);
+    })
+}, true);
 
 function init() {}
 

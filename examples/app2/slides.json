@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Slide 1",
+        "body": "This is the content for slide 1",
+        "duration": 5
+    },
+    {
+        "title": "Slide 2",
+        "body": "New content for slide 2",
+        "duration": 5
+    }
+]
