@@ -23,7 +23,7 @@ watch_json("slides.json", (data) => {
     data.forEach((slide) => {
         slideManager.add(slide.title, slide.body, slide.duration);
     })
-}, true);
+});
 
 function init() {}
 

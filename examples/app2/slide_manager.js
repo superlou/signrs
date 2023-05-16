@@ -12,13 +12,15 @@ class SlideManager {
             return;
         }
         
-        if (this.timeRemaining === null) {
-            this.timeRemaining == this.slides[this.activeIndex].duration;
+        if (this.timeRemaining == null) {
+            this.timeRemaining = this.slides[this.activeIndex].duration;
         }
         
-        let title = this.slides[this.activeIndex].title;
-        let body = this.slides[this.activeIndex].text;
-        let duration = this.slides[this.activeIndex].duration;
+        let slide = this.slides[this.activeIndex];
+        
+        let title = slide.title;
+        let body = slide.text;
+        let duration = slide.duration;
         
         draw_text(font.light, title, 20, 24, 64, color.title);
         draw_text(font.normal, body, 20, 96, 18, color.body);

@@ -365,12 +365,14 @@ fn watch_json(
     // todo Keeping the callback outside the JsEnv seems to cause core dump on quit
     watches.borrow_mut().insert(canonical_path, callback.clone());
     
-    if args.len() > 2 {
-        let run_first = args[2].try_js_into::<bool>(context)?;
-        if run_first {
-            let data = JsEnv::load_json(&full_path, context)?;
-            callback.clone().call(&JsValue::Undefined, &[data], context)?;
-        }
+    let run_first = match args.get(2) {
+        Some(arg) => arg.try_js_into::<bool>(context)?,
+        None => true,
+    };
+    
+    if run_first {
+        let data = JsEnv::load_json(&full_path, context)?;
+        callback.clone().call(&JsValue::Undefined, &[data], context)?;
     }
     
     Ok(JsEnv::load_json(&full_path, context)?)
