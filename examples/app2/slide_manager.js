@@ -17,14 +17,9 @@ class SlideManager {
         }
         
         let slide = this.slides[this.activeIndex];
+        slide.draw(dt);
         
-        let title = slide.title;
-        let body = slide.text;
         let duration = slide.duration;
-        
-        draw_text(font.light, title, 20, 24, 64, color.title);
-        draw_text(font.normal, body, 20, 96, 18, color.body);
-        
         let w = this.timeRemaining / duration * 640;
         draw_rectangle(0, 0, 640, 4, color.black);
         draw_rectangle(640 - w, 0, w, 4, color.white);
@@ -49,6 +44,11 @@ class Slide {
         this.title = title;
         this.text = text;
         this.duration = duration;
+    }
+    
+    draw(dt) {        
+        draw_text(font.light, this.title, 20, 24, 64, color.title);
+        draw_text(font.normal, this.text, 20, 96, 18, color.body);        
     }
 }
 
