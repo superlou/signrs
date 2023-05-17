@@ -7,7 +7,7 @@ use std::rc::Rc;
 
 use boa_engine::{Context, JsNativeError, JsResult, NativeFunction, JsError, JsValue};
 use boa_engine::class::{Class, ClassBuilder};
-use boa_engine::object::builtins::JsFunction;
+use boa_engine::object::builtins::{JsFunction, JsArray};
 use boa_engine::property::Attribute;
 use boa_engine::value::TryFromJs;
 use boa_gc::{Trace, Finalize};
@@ -150,6 +150,17 @@ pub fn register_fns_and_types(
             })
         ).unwrap();
     }
+
+    // DON'T ACTUALLY NEED GRAPHICS CALLS    
+    let graphics_calls_ = graphics_calls.clone();
+    unsafe {
+        script_env.context.register_global_callable(
+            "size_text", 1, NativeFunction::from_closure(move |this, args, context| {
+                size_text(this, args, context)
+            })
+        ).unwrap();
+    }    
+    
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
@@ -229,8 +240,8 @@ fn draw_text(
     _this: &JsValue, args: &[JsValue], context: &mut Context
     ) -> JsResult<JsValue>
 {
-    if args.len() < 5 {
-        return Err(JsNativeError::typ().with_message("Too few arguments for draw_test").into());
+    if args.len() < 6 {
+        return Err(JsNativeError::typ().with_message("Too few arguments for draw_text").into());
     }
 
     let js_font = args[0].as_object()
@@ -239,11 +250,9 @@ fn draw_text(
         .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
         .clone();
         
-    let text = args[1].try_js_into::<String>(context)?;
-    
+    let text = args[1].try_js_into::<String>(context)?;   
     let x = args[2].try_js_into::<f64>(context)? as f32;
     let y = args[3].try_js_into::<f64>(context)? as f32;
-    
     let s = args[4].try_js_into::<f64>(context)? as f32;
 
     let c = args[5].as_object()
@@ -258,6 +267,30 @@ fn draw_text(
     );
 
     Ok(JsValue::Undefined)
+}
+
+fn size_text(_this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue>
+{
+    if args.len() < 3 {
+        return Err(JsNativeError::typ().with_message("Too few arguments for size_text").into());
+    }
+    
+    let js_font = args[0].as_object()
+        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
+        .downcast_ref::<JsFont>()
+        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
+        .clone();    
+    let text = args[1].try_js_into::<String>(context)?;
+    let s = args[2].try_js_into::<f64>(context)? as f32;
+    
+    let block = js_font.font.layout_text(&text, s, TextOptions::new());
+    let size = block.size();
+    
+    let array = JsArray::new(context);
+    array.push(size.x, context)?;
+    array.push(size.y, context)?;
+    
+    Ok(JsValue::Object(array.into()))
 }
 
 fn draw_image(

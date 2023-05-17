@@ -2,6 +2,7 @@ var resolution = [640, 480];
 var multisampling = 1;
 
 include("slide_manager.js");
+include("ticker.js");
 
 let color = {
     black: new Color(0, 0, 0),
@@ -17,6 +18,7 @@ let font = {
 }
 
 let slideManager = newSlideManager();
+let ticker = newTicker();
 
 watch_json("slides.json", (data) => {
     slideManager.clear();
@@ -25,9 +27,14 @@ watch_json("slides.json", (data) => {
     })
 });
 
+watch_json("ticker.json", (data) => {
+   ticker.setMessages(data.messages); 
+});
+
 function init() {}
 
 function draw(dt) {
     clear_screen(color.background);
     slideManager.draw(dt);
+    ticker.draw(dt);
 }
