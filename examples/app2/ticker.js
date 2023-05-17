@@ -16,6 +16,10 @@ class Ticker {
       
       if (this.items.length > 0) {
         endX = this.items.at(-1).endX;
+        
+        if (this.items[0].endX < 0) {
+          this.items.shift();
+        }
       }
       
       let safety = 100;
