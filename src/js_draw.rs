@@ -13,11 +13,22 @@ use boa_engine::value::TryFromJs;
 use boa_gc::{Trace, Finalize};
 use boa_runtime::Console;
 use speedy2d::color::Color;
+use speedy2d::dimen::Vec2;
 use speedy2d::shape::Rectangle;
-use speedy2d::font::{Font, TextOptions, TextLayout};
+use speedy2d::font::{Font, TextOptions, TextLayout, FormattedTextBlock};
 
-use crate::window_handler::GraphicsCalls;
 use crate::js_env::JsEnv;
+
+pub enum GraphicsCalls {
+    ClearScreenBlack,
+    ClearScreen(Color),
+    DrawRectangle(Rectangle, Color),
+    DrawText(Vec2, Color, Rc<FormattedTextBlock>),
+    DrawImage(Vec2, String),
+    DrawRectangleImageTinted(Rectangle, String, Color),
+    PushOffset(Vec2),
+    PopOffset(),
+}
 
 #[derive(Debug, Trace, Finalize, TryFromJs, Clone)]
 struct JsColor {

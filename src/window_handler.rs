@@ -23,6 +23,7 @@ use thiserror::Error;
 
 use crate::iter_util::iter_unique;
 use crate::js_env::JsEnv;
+use crate::js_draw::GraphicsCalls;
 
 #[derive(Error, Debug)]
 enum SignError {
@@ -40,7 +41,6 @@ pub struct SignWindowHandler {
     last_frame_time: Instant,
     last_mouse_down_time: Option<Instant>,
     pub is_fullscreen: Arc<Mutex<bool>>,
-    graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
     draw_offset_stack: Vec<Vec2>,
     draw_offset: Vec2,
     pub root_path: Arc<Mutex<PathBuf>>,
@@ -53,17 +53,6 @@ pub struct SignWindowHandler {
     
     file_change_rx: mpsc::Receiver<PathBuf>,
     file_change_tx: mpsc::Sender<PathBuf>,
-}
-
-pub enum GraphicsCalls {
-    ClearScreenBlack,
-    ClearScreen(Color),
-    DrawRectangle(Rectangle, Color),
-    DrawText(Vec2, Color, Rc<FormattedTextBlock>),
-    DrawImage(Vec2, String),
-    DrawRectangleImageTinted(Rectangle, String, Color),
-    PushOffset(Vec2),
-    PopOffset(),
 }
 
 impl WindowHandler<String> for SignWindowHandler {
@@ -81,9 +70,9 @@ impl WindowHandler<String> for SignWindowHandler {
         for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
             // Check if it's a watched file with a callback
             if let Some(js_fn) = self.watches.borrow().get(&changed_path_buf) {               
-                match JsEnv::load_json(&changed_path_buf, &mut self.script_env.context) {
+                match JsEnv::load_json(&changed_path_buf, self.script_env.context_mut()) {
                     Ok(data) => {
-                        if let Err(err) = js_fn.call(&JsValue::Undefined, &[data], &mut self.script_env.context) {
+                        if let Err(err) = js_fn.call(&JsValue::Undefined, &[data], self.script_env.context_mut()) {
                             dbg!(&err);
                         }
                     },
@@ -103,7 +92,7 @@ impl WindowHandler<String> for SignWindowHandler {
         
         if reload_script_env {
             let root_path = self.root_path.lock().unwrap().clone();
-            match JsEnv::new(&root_path, &self.graphics_calls, &self.watches) {
+            match JsEnv::new(&root_path, &self.watches) {
                 Ok(mut script_env) => match script_env.call_init() {
                     Ok(_) => {
                         self.script_env = script_env;
@@ -121,7 +110,7 @@ impl WindowHandler<String> for SignWindowHandler {
         }
 
         // Perform queued graphic calls
-        for call in self.graphics_calls.clone().borrow().iter() {
+        for call in self.script_env.graphics_calls().clone().borrow().iter() {
             match call {
                 GraphicsCalls::ClearScreenBlack => {
                   graphics.clear_screen(Color::BLACK);  
@@ -154,7 +143,7 @@ impl WindowHandler<String> for SignWindowHandler {
                 }
             }
         }
-        self.graphics_calls.borrow_mut().clear();
+        self.script_env.clear_graphics_calls();
         
         helper.request_redraw();
     }
@@ -214,15 +203,13 @@ impl SignWindowHandler {
          
         watcher.watch(app_root.as_ref(), RecursiveMode::Recursive).unwrap();
              
-        let graphics_calls = Rc::new(RefCell::new(vec![]));
         let watches = Rc::new(RefCell::new(HashMap::new()));
              
         let mut handler = SignWindowHandler {
-            script_env: JsEnv::new(app_root.as_ref(), &graphics_calls, &watches).unwrap(),
+            script_env: JsEnv::new(app_root.as_ref(), &watches).unwrap(),
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
             is_fullscreen: Arc::new(Mutex::new(false)),
-            graphics_calls,
             draw_offset: Vec2::ZERO,
             draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),

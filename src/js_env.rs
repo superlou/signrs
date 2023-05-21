@@ -13,28 +13,41 @@ use boa_engine::property::{Attribute, PropertyKey};
 use boa_engine::value::TryFromJs;
 use boa_runtime::Console;
 
-use crate::js_draw::register_fns_and_types;
-use crate::window_handler::GraphicsCalls;
+use crate::js_draw::{register_fns_and_types, GraphicsCalls};
 
 pub struct JsEnv {
-    pub context: Context<'static>,
+    context: Context<'static>,
     module: Module,
     app_path: PathBuf,
+    graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
 }
 
 impl JsEnv {
     pub fn new(
         app_path: &Path,
-        graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>,
         watches: &Rc<RefCell<HashMap<PathBuf, JsFunction>>>) -> JsResult<Self>
 {
-        let (context, module) = JsEnv::create_context(app_path, graphics_calls, watches)?;
+        let graphics_calls = Rc::new(RefCell::new(vec![]));
+        let (context, module) = JsEnv::create_context(app_path, &graphics_calls, watches)?;
         
         Ok(JsEnv {
             context,
             module,
             app_path: app_path.to_owned(),
+            graphics_calls,
         })
+    }
+    
+    pub fn graphics_calls(&self) -> &Rc<RefCell<Vec<GraphicsCalls>>> {
+        &self.graphics_calls
+    }
+    
+    pub fn clear_graphics_calls(&self) {
+        self.graphics_calls.borrow_mut().clear();
+    }
+    
+    pub fn context_mut(&mut self) -> &mut Context<'static> {
+        &mut self.context
     }
     
     pub fn create_context(
