@@ -151,16 +151,11 @@ pub fn register_fns_and_types(
         ).unwrap();
     }
 
-    // DON'T ACTUALLY NEED GRAPHICS CALLS    
-    let graphics_calls_ = graphics_calls.clone();
-    unsafe {
-        context.register_global_callable(
-            "size_text", 1, NativeFunction::from_closure(move |this, args, context| {
-                size_text(this, args, context)
-            })
-        ).unwrap();
-    }    
-    
+    context.register_global_callable(
+        "size_text", 1, NativeFunction::from_copy_closure(move |this, args, context| {
+            size_text(this, args, context)
+        })
+    ).unwrap();
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
