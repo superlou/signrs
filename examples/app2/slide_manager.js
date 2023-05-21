@@ -1,4 +1,4 @@
-class SlideManager {
+export default class SlideManager {
     slides = [];
     activeIndex = 0;
     timeRemaining = null;
@@ -7,7 +7,7 @@ class SlideManager {
         this.slides.push(new Slide(title, text, duration));    
     }
     
-    draw(dt) {
+    draw(dt, font, color) {
         if (this.slides.length == 0) {
             return;
         }
@@ -17,7 +17,7 @@ class SlideManager {
         }
         
         let slide = this.slides[this.activeIndex];
-        slide.draw(dt);
+        slide.draw(dt, font, color);
         
         let duration = slide.duration;
         let w = this.timeRemaining / duration * 640;
@@ -46,7 +46,7 @@ class Slide {
         this.duration = duration;
     }
     
-    draw(dt) {        
+    draw(dt, font, color) {        
         draw_text(font.light, this.title, 20, 24, 64, color.title);
         draw_text(font.normal, this.text, 20, 96, 18, color.body);        
     }

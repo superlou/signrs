@@ -112,21 +112,21 @@ impl Class for JsImage {
 }
 
 pub fn register_fns_and_types(
-    script_env: &mut JsEnv,
+    context: &mut Context,
     graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>,
     watches: &Rc<RefCell<HashMap<PathBuf, JsFunction>>>
 ) {
-    let console = Console::init(&mut script_env.context);
-    script_env.context.register_global_property(Console::NAME, console, Attribute::all())
+    let console = Console::init(context);
+    context.register_global_property(Console::NAME, console, Attribute::all())
         .expect("Unable to create console object");
     
-    script_env.context.register_global_class::<JsColor>().expect("Could not register JsColor");
-    script_env.context.register_global_class::<JsFont>().expect("Could not register JsFont");
-    script_env.context.register_global_class::<JsImage>().expect("Could not register Image");
+    context.register_global_class::<JsColor>().expect("Could not register JsColor");
+    context.register_global_class::<JsFont>().expect("Could not register JsFont");
+    context.register_global_class::<JsImage>().expect("Could not register Image");
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "clear_screen", 1, NativeFunction::from_closure(move |this, args, context| {
                 clear_screen(&graphics_calls_, this, args, context)
             })
@@ -135,7 +135,7 @@ pub fn register_fns_and_types(
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "draw_rectangle", 1, NativeFunction::from_closure(move |this, args, context| {
                 draw_rectangle(&graphics_calls_, this, args, context)
             })
@@ -144,7 +144,7 @@ pub fn register_fns_and_types(
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "draw_text", 1, NativeFunction::from_closure(move |this, args, context| {
                 draw_text(&graphics_calls_, this, args, context)
             })
@@ -154,7 +154,7 @@ pub fn register_fns_and_types(
     // DON'T ACTUALLY NEED GRAPHICS CALLS    
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "size_text", 1, NativeFunction::from_closure(move |this, args, context| {
                 size_text(this, args, context)
             })
@@ -164,7 +164,7 @@ pub fn register_fns_and_types(
     
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "draw_image", 1, NativeFunction::from_closure(move |this, args, context| {
                 draw_image(&graphics_calls_, this, args, context)
             })
@@ -173,7 +173,7 @@ pub fn register_fns_and_types(
 
     let graphics_calls_ = graphics_calls.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "with_offset", 1, NativeFunction::from_closure(move |this, args, context| {
                 with_offset(&graphics_calls_, this, args, context)
             })
@@ -182,7 +182,7 @@ pub fn register_fns_and_types(
 
     let watches_ = watches.clone();
     unsafe {
-        script_env.context.register_global_callable(
+        context.register_global_callable(
             "watch_json", 2, NativeFunction::from_closure(move |this, args, context| {
                 watch_json(&watches_, this, args, context)
             })

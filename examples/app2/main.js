@@ -1,9 +1,17 @@
-var resolution = [640, 480];
-var multisampling = 1;
+export let resolution = [640, 480];
+export let multisampling = 1;
 
-include("slide_manager.js");
-include("ticker.js");
-include("fps.js");
+// include("slide_manager.js");
+// include("ticker.js");
+// include("fps.js");
+
+import Fps from "fps.js";
+import Ticker from "ticker.js";
+import SlideManager from "slide_manager.js";
+
+let fps = new Fps(540, 10, 20);
+let ticker = new Ticker();
+let slideManager = new SlideManager();
 
 let color = {
     black: new Color(0, 0, 0),
@@ -20,10 +28,6 @@ let font = {
     light: new Font("assets/Roboto-Thin.ttf"),
 }
 
-let slideManager = newSlideManager();
-let ticker = newTicker();
-let fps = newFps(540, 10, 20);
-
 watch_json("slides.json", (data) => {
     slideManager.clear();
     data.forEach((slide) => {
@@ -35,11 +39,13 @@ watch_json("ticker.json", (data) => {
    ticker.setMessages(data.messages); 
 });
 
-function init() {}
+export function init() {
+    console.log("init");
+}
 
-function draw(dt) {
+export function draw(dt) {
     clear_screen(color.background);
-    slideManager.draw(dt);
-    ticker.draw(dt);
-    fps.draw(dt);
+    slideManager.draw(dt, font, color);
+    ticker.draw(dt, font, color);
+    fps.draw(dt, font, color);
 }

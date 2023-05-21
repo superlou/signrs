@@ -23,7 +23,6 @@ use thiserror::Error;
 
 use crate::iter_util::iter_unique;
 use crate::js_env::JsEnv;
-use crate::js_draw;
 
 #[derive(Error, Debug)]
 enum SignError {
@@ -104,21 +103,16 @@ impl WindowHandler<String> for SignWindowHandler {
         
         if reload_script_env {
             let root_path = self.root_path.lock().unwrap().clone();
-            let mut script_env = JsEnv::new(&root_path);
-            
-            js_draw::register_fns_and_types(
-                &mut script_env,
-                &self.graphics_calls,
-                &self.watches,
-            );
-            
-            match script_env.call_init() {
-                Ok(_) => {
-                    self.script_env = script_env;
-                    println!("Reloaded script environment.");
+            match JsEnv::new(&root_path, &self.graphics_calls, &self.watches) {
+                Ok(mut script_env) => match script_env.call_init() {
+                    Ok(_) => {
+                        self.script_env = script_env;
+                        println!("Reloaded script environment.");
+                    },
+                    Err(err) => { dbg!(&err); },
                 },
                 Err(err) => { dbg!(&err); },
-            };
+            }
         }
         
         // Call script draw function
@@ -220,28 +214,24 @@ impl SignWindowHandler {
          
         watcher.watch(app_root.as_ref(), RecursiveMode::Recursive).unwrap();
              
+        let graphics_calls = Rc::new(RefCell::new(vec![]));
+        let watches = Rc::new(RefCell::new(HashMap::new()));
+             
         let mut handler = SignWindowHandler {
-            script_env: JsEnv::new(app_root.as_ref()),
+            script_env: JsEnv::new(app_root.as_ref(), &graphics_calls, &watches).unwrap(),
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
             is_fullscreen: Arc::new(Mutex::new(false)),
-            graphics_calls: Rc::new(RefCell::new(vec![])),
+            graphics_calls,
             draw_offset: Vec2::ZERO,
             draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
-            watches: Rc::new(RefCell::new(HashMap::new())),
+            watches,
             watcher: Box::new(watcher),
             file_change_tx: tx,
             file_change_rx: rx,
         };
-        
-        js_draw::register_fns_and_types(
-            &mut handler.script_env,
-            &handler.graphics_calls,
-            // &handler.root_path,
-            &handler.watches,
-        );
         
         if let Err(err) = handler.script_env.call_init() {
             dbg!(err);
@@ -252,14 +242,14 @@ impl SignWindowHandler {
     }
     
     pub fn get_resolution(&mut self) -> Option<(u32, u32)> {
-        match self.script_env.get_global_array::<u32, _>("resolution") {
+        match self.script_env.get_array::<u32, _>("resolution") {
             Ok(a) if a.len() >= 2 => Some((a[0], a[1])),
             _ => None,
         }
     }
     
     pub fn get_multisampling(&mut self) -> Option<u16> {
-        match self.script_env.get_global::<i32, _>("multisampling") {
+        match self.script_env.get_value::<i32, _>("multisampling") {
             Ok(value) => Some(value as u16),
             Err(_) => None,
         }
