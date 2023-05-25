@@ -3,12 +3,13 @@ export default class Ticker {
   nextMessageId = 0;
   items = [];
   size = 24;
-  width = 640;
+  width = 960;
+  yPos = 505;
   speed = 100;
   
   draw(dt, font, color) {
     if (this.items.length > 0) {
-      this.items.forEach((item) => item.draw(dt * this.speed, 440, color));
+      this.items.forEach((item) => item.draw(dt * this.speed, this.yPos, color));
     }
     
     if (this.messages.length > 0) {

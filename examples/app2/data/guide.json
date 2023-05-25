@@ -1,0 +1,1544 @@
+[
+    {
+        "finish": "2023-03-24T04:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Railways: Past, Present, and Future",
+        "start": "2023-03-24T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T01:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steam-powered Cosplay",
+        "start": "2023-03-24T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T04:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "The Time Traveler's Ball: A Night of Elegance and Retro-Futuristic Revelry",
+        "start": "2023-03-24T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T01:30:00.000000+0000",
+        "location": "Live 3",
+        "name": "Airship Adventures: Exploring the World of Steampunk Aviation",
+        "start": "2023-03-24T00:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T02:15:00.000000+0000",
+        "location": "Live 2",
+        "name": "Brass Band Bonanza: Energetic and Upbeat Steampunk Brass Ensembles",
+        "start": "2023-03-24T01:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T02:45:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Robotics Challenge: Competing in Mechanical Marvels",
+        "start": "2023-03-24T01:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T04:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Beyond Time and Space: Late-Night Discussions on Steampunk and the Multiverse",
+        "start": "2023-03-24T02:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T04:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Gadget Galore: Fast-paced Game Show Testing Knowledge of Steampunk Gadgets",
+        "start": "2023-03-24T03:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T14:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Retrofied Rhythms: Dance Party with a Steampunk Twist",
+        "start": "2023-03-24T13:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T14:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Riddle Me This: Steampunk Edition - Solving Enigmatic Challenges for Prizes",
+        "start": "2023-03-24T13:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T15:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Steampunk Literature",
+        "start": "2023-03-24T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T17:00:00.000000+0000",
+        "location": "Montgomery House, 1st Floor",
+        "name": "Steamcraft Workshop",
+        "start": "2023-03-24T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:00:00.000000+0000",
+        "location": "Montgomery",
+        "name": "The Steampunk Tea Party",
+        "start": "2023-03-24T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T06:00:00.000000+0000",
+        "location": "2nd Floor",
+        "name": "Rewriting Revolution: Alternate Histories of Industrial Uprisings",
+        "start": "2023-03-24T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T06:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "The Dark Arts of Steampunk Fashion: Creating Edgy and Alternative Looks",
+        "start": "2023-03-24T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T16:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Decoding the Secrets: Creating Intricate Plots in Alternate History",
+        "start": "2023-03-24T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T17:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Dieselpunk Deco: Crafting Alternate Realities with Art Deco Aesthetics",
+        "start": "2023-03-24T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T16:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Dance Party: Unleashing Your Moves in a Retro-futuristic Ambiance",
+        "start": "2023-03-24T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T16:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Clockwork Serenades: Musical Melodies of Steampunk Locomotion",
+        "start": "2023-03-24T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T16:15:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steampunk Dance Workshop: Mastering Victorian-inspired Moves",
+        "start": "2023-03-24T15:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T16:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Mechanical Melodies: Steampunk Music Showcase",
+        "start": "2023-03-24T15:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T16:30:00.000000+0000",
+        "location": "Stone Courtyard",
+        "name": "Advanced Sewing and Tailoring: Fine-Tuning Your Cosplay Fit and Finish",
+        "start": "2023-03-24T15:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T22:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Musical Contraptions: Experimental Sounds in the World of Steampunk",
+        "start": "2023-03-24T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T04:00:00.000000+0000",
+        "location": "LCCC",
+        "name": "Steampunk Virtual Reality",
+        "start": "2023-03-24T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Victorian Tea Duelling: A Gentlemanly and Ladylike Contest of Biscuit Dunking",
+        "start": "2023-03-24T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T17:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Locomotive Collectibles: Curating a Victorian Trove",
+        "start": "2023-03-24T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T18:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Steam Symphony: A Steampunk Orchestral Extravaganza",
+        "start": "2023-03-24T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T18:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "The Steampunk Gaming Lounge: Retro-inspired Fun and Challenges",
+        "start": "2023-03-24T16:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T17:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Culinary Delights: Tasting and Sampling Retro-Futuristic Cuisine",
+        "start": "2023-03-24T16:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T17:45:00.000000+0000",
+        "location": "Live 2",
+        "name": "Aetheric Energy Exhibition: Demonstrating Steampunk Power and Innovations",
+        "start": "2023-03-24T16:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T17:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Secrets of Steampunk Fashion: Unveiling Tips and Tricks from the Experts",
+        "start": "2023-03-24T16:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T00:00:00.000000+0000",
+        "location": "Cosplay Repair",
+        "name": "Steampunk Locomotive Design",
+        "start": "2023-03-24T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T03:00:00.000000+0000",
+        "location": "Level 3",
+        "name": "Victorian Splendor: Blending History and Fantasy in Steampunk Worlds",
+        "start": "2023-03-24T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T18:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Anime Marathon: Screening of Retro-Futuristic Anime Classics",
+        "start": "2023-03-24T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T18:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "The Enigma of Time Travel: Late-Night Discussions on Temporal Anomalies",
+        "start": "2023-03-24T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T18:00:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Tarot Workshop: Exploring Divination with a Retro-Futuristic Twist",
+        "start": "2023-03-24T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T19:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Steampunk and Retro Gaming",
+        "start": "2023-03-24T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Culinary Contraptions: Creative Cooking with Gears",
+        "start": "2023-03-24T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:00:00.000000+0000",
+        "location": "Two Kings",
+        "name": "The Art of Steam: Creative Expressions in Steampunk Locomotives",
+        "start": "2023-03-24T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T19:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Advanced Electronics and Animatronics: Bringing Your Cosplay to Life",
+        "start": "2023-03-24T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T19:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Writing the Great War: Alternate History in the Dieselpunk Era",
+        "start": "2023-03-24T18:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T19:15:00.000000+0000",
+        "location": "Live 2",
+        "name": "Exploring Colonial Alternatives: Rewriting History Beyond Eurocentrism",
+        "start": "2023-03-24T18:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steam-Powered Serenade: A Night of Steampunk-Inspired Music",
+        "start": "2023-03-24T18:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T19:30:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Survivor: Adventure-based Game Show Set in a Retro-Futuristic Environment",
+        "start": "2023-03-24T18:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T19:30:00.000000+0000",
+        "location": "Main",
+        "name": "The Steampunk Chronicles: Panel Discussions on the Evolution of the Genre",
+        "start": "2023-03-24T18:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Artisan Alley: Showcasing Steampunk Art, Jewelry, and Crafts",
+        "start": "2023-03-24T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "After Hours with the Airship Pirates: A Late-Night Pirate Adventure",
+        "start": "2023-03-24T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Intermediate Cosplay Construction: Taking Your Costumes to the Next Level",
+        "start": "2023-03-24T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steam-Powered Comedy Hour: Stand-up and Improv Performances",
+        "start": "2023-03-24T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Mad Scientist's Laboratory: Interactive Exhibit of Steampunk Experiments",
+        "start": "2023-03-24T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steam Roulette: High-Stakes Game of Chance and Strategy with a Steampunk Flair",
+        "start": "2023-03-24T19:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Retro Gaming Galore: Steampunk-inspired Games and Competitions",
+        "start": "2023-03-24T19:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Introduction to Cosplay Electronics: Adding Lights and Effects to Your Costume",
+        "start": "2023-03-24T19:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T20:45:00.000000+0000",
+        "location": "Live 5",
+        "name": "Midnight Masquerade: Late-Night Steampunk Ballroom Dancing and Elegance",
+        "start": "2023-03-24T19:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Mechanical Marvels: Innovations in Steampunk Train Engineering",
+        "start": "2023-03-24T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "The Gear Gauntlet: Fast-paced Obstacle Course Competition with a Steampunk Twist",
+        "start": "2023-03-24T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Steampunk Super Smash Showdown: Retro-Futuristic Battles of Pop Culture Icons",
+        "start": "2023-03-24T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T04:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Steampunk Movie Fan Theory Panel: Exploring Intriguing Theories about Pop Culture Films",
+        "start": "2023-03-24T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T00:30:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Movie Marathon: Screening of Cult Classic Films with a Steampunk Vibe",
+        "start": "2023-03-24T20:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:30:00.000000+0000",
+        "location": "Main",
+        "name": "Building the Brass Beast: Steampunk Locomotive Construction",
+        "start": "2023-03-24T20:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T21:30:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Clockwork Chess Championship: Strategic Battles in a Steampunk Setting",
+        "start": "2023-03-24T20:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T22:15:00.000000+0000",
+        "location": "Live 2",
+        "name": "The Steampunk Soundtrack",
+        "start": "2023-03-24T20:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T00:00:00.000000+0000",
+        "location": "Montgomery",
+        "name": "Aether-infused Confections: Whimsical Desserts for Steampunk Palates",
+        "start": "2023-03-24T21:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T22:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Sci-Fi Debate: Engaging Discussions on Pop Culture-inspired Science Fiction Topics",
+        "start": "2023-03-24T21:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T22:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Artistry",
+        "start": "2023-03-24T21:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:15:00.000000+0000",
+        "location": "Live 5",
+        "name": "Brass and Strings: An Orchestral Journey into Retro-Futuristic Sounds",
+        "start": "2023-03-24T21:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T22:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Punk'd: Steampunk Edition - A Prank Game Show with Retro-Futuristic Twists",
+        "start": "2023-03-24T21:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T04:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Retro-Futuristic Rockers: Live Performance by Steampunk Bands",
+        "start": "2023-03-24T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:00:00.000000+0000",
+        "location": "Main",
+        "name": "A Tale of Two Eras: Blending Steampunk and Dieselpunk in Alternate Worlds",
+        "start": "2023-03-24T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "Cosplay Performance: Acting and Characterization for the Stage",
+        "start": "2023-03-24T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:30:00.000000+0000",
+        "location": "Live 3",
+        "name": "The Steam Revolution",
+        "start": "2023-03-24T22:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steaming Through Time: Steampunk Locomotives in Historical Fiction",
+        "start": "2023-03-24T22:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Retro Arcade Revival: Steampunk-inspired Video Game Showdown",
+        "start": "2023-03-24T22:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-24T23:45:00.000000+0000",
+        "location": "Live 2",
+        "name": "The Steampunk Bazaar: Curated Marketplace of Unique Gear and Curiosities",
+        "start": "2023-03-24T22:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Locomotive Photography: Capturing the Aesthetics",
+        "start": "2023-03-24T23:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Whistle and Strings: Folk and Acoustic Steampunk Concert",
+        "start": "2023-03-24T23:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steampunk Gaming",
+        "start": "2023-03-24T23:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T00:45:00.000000+0000",
+        "location": "Live 1",
+        "name": "Alternative History in Steampunk Fiction: Exploring the Possibilities",
+        "start": "2023-03-24T23:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:00:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steampunk Weaponry",
+        "start": "2023-03-25T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:30:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Gaming Trivia: Testing Knowledge of Retro-Futuristic Video Games and Characters",
+        "start": "2023-03-25T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "Steampunk Fantasy Book Club: Exploring Pop Culture-inspired Fantasy Literature in a Victorian Setting",
+        "start": "2023-03-25T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T01:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Mystery Manor: Investigative Game Show Solving Steampunk Mysteries",
+        "start": "2023-03-25T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T05:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Disney Sing-Along: A Magical Musical Tribute to Disney Classics",
+        "start": "2023-03-25T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:30:00.000000+0000",
+        "location": "Live 3",
+        "name": "Late-Night Tea Dueling: A Victorian Game of Wits and Steeped Beverages",
+        "start": "2023-03-25T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:00:00.000000+0000",
+        "location": "Zenkaikon Online (online.zenkaikon.com)",
+        "name": "Steampunk Movie Mashup: Screening of Retro-Futuristic Films with Cross-genre Elements",
+        "start": "2023-03-25T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Alchemy in the Kitchen: Transforming Ingredients with Steampunk Flair",
+        "start": "2023-03-25T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Whirling Wheels: Steampunk Skate Party for Retro Roller Skating",
+        "start": "2023-03-25T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Workshop Wonders: Hands-on Steampunk Crafting and Construction",
+        "start": "2023-03-25T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:15:00.000000+0000",
+        "location": "Live 5",
+        "name": "The Inventor's Workshop: Creative Design and Invention Challenges in Steampunk Style",
+        "start": "2023-03-25T01:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T02:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Advanced Wig Styling: Mastering Complex Hairstyles for Cosplay",
+        "start": "2023-03-25T01:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T03:00:00.000000+0000",
+        "location": "Main",
+        "name": "Melodic Contraptions: Experimental and Avant-Garde Steampunk Music Experience",
+        "start": "2023-03-25T02:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T04:00:00.000000+0000",
+        "location": "100 S Queen Street",
+        "name": "Cosplay Contest Strategies: Tips for Success and Presentation Skills",
+        "start": "2023-03-25T02:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T03:15:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Music Covers: Bands and Artists Performing Pop Culture Hits with a Steampunk Spin",
+        "start": "2023-03-25T02:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T03:30:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steam Pioneers: Visionaries of the Steampunk Locomotive Era",
+        "start": "2023-03-25T02:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T03:30:00.000000+0000",
+        "location": "Live 5",
+        "name": "Steampunk Marvel vs. DC: Epic Showdown of Superheroes and Villains",
+        "start": "2023-03-25T02:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T03:30:00.000000+0000",
+        "location": "Main",
+        "name": "Steamy Folk Fusion: Blending Traditional Tunes with Steampunk Elements",
+        "start": "2023-03-25T03:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T05:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Fashion Workshop: Creating Retro-Futuristic Attire",
+        "start": "2023-03-25T03:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T05:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steam Technology and Medicine",
+        "start": "2023-03-25T03:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T06:00:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk TV Show Rewind: Nostalgic TV Series with a Retro-Futuristic Twist",
+        "start": "2023-03-25T03:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T04:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Science Fair: Innovative Exhibits and Demonstrations",
+        "start": "2023-03-25T03:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T04:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steampunk Locomotive Races",
+        "start": "2023-03-25T03:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T06:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Steampunk Chorus Spectacular: Harmonious Voices in Unison",
+        "start": "2023-03-25T04:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T05:45:00.000000+0000",
+        "location": "Live 1",
+        "name": "Introduction to 3D Printing and Cosplay: Creating Props and Accessories",
+        "start": "2023-03-25T04:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T06:00:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steampunk Cartoon Craze: Nostalgic Animated Shows with a Retro-Futuristic Edge",
+        "start": "2023-03-25T05:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:00:00.000000+0000",
+        "location": "Cosplay Repair",
+        "name": "Wonders of Steam",
+        "start": "2023-03-25T13:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:00:00.000000+0000",
+        "location": "Montgomery",
+        "name": "Makeup for Cosplay: Enhancing Your Look and Character Transformation",
+        "start": "2023-03-25T13:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:00:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Sci-Fi Trivia Night: Testing Knowledge of Retro-Futuristic Films and TV Shows",
+        "start": "2023-03-25T13:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:30:00.000000+0000",
+        "location": "Live 5",
+        "name": "Machination Mayhem: Team-based Game Show of Building and Engineering Challenges",
+        "start": "2023-03-25T13:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T14:45:00.000000+0000",
+        "location": "Live 1",
+        "name": "Vintage Steam",
+        "start": "2023-03-25T13:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T14:45:00.000000+0000",
+        "location": "Live 3",
+        "name": "Mechanical Automata",
+        "start": "2023-03-25T13:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Spiraling Cogs: Exploring the Intricate Mechanics of Steampunk Trains",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T06:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Steampunk Gaming Exhibition: Showcasing Retro-Futuristic Video Games and Their Influence on Pop Culture",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Steam Power Propulsion",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Level 3",
+        "name": "Basic Sewing Techniques for Cosplay: From Fabric Selection to Stitching",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T06:00:00.000000+0000",
+        "location": "2nd Floor",
+        "name": "Steampunk Literature Adaptations",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Victorian Etiquette Workshop: Polishing Manners for Steampunk Society",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T01:00:00.000000+0000",
+        "location": "Montgomery",
+        "name": "Savory Steam: Steampunk Fusion Cuisine from Around the World",
+        "start": "2023-03-25T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steampunk Subcultures",
+        "start": "2023-03-25T14:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Steampunk Star Wars: A Galaxy Far, Far Steam-powered",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Timeless Elegance: Victorian Etiquette in the Steampunk Era",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T15:30:00.000000+0000",
+        "location": "Main",
+        "name": "Steam-powered Revolution",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T16:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Pok\u00e9mon Trainer Battle: Catch 'Em All in a Victorian-inspired World",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T16:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "The Locomotive Alchemists: Steam-Powered Transmutations",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "Steampunk Mysteries",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T16:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "The Artistry of Victorian Futurism: Steampunk Visual Arts Exhibition",
+        "start": "2023-03-25T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:00:00.000000+0000",
+        "location": "Main",
+        "name": "Mechanical Engineering in Steampunk",
+        "start": "2023-03-25T15:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Clockwork Cabaret: A Night of Steampunk Music and Dance",
+        "start": "2023-03-25T15:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steamcraft: Engineering Steampunk Dreams on Rails",
+        "start": "2023-03-25T15:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T16:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Unveiling Atlantis: Exploring Alternate History with Steampunk Flair",
+        "start": "2023-03-25T15:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Roleplaying",
+        "start": "2023-03-25T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:00:00.000000+0000",
+        "location": "LCCC",
+        "name": "Beyond the Goggles: Exploring Steampunk Subcultures and Communities",
+        "start": "2023-03-25T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Beyond Steampunk: Genre-blending Alternate Histories with Dieselpunk Elements",
+        "start": "2023-03-25T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steampunk Burlesque Extravaganza: A Late-Night Sensual Spectacle",
+        "start": "2023-03-25T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:15:00.000000+0000",
+        "location": "Live 5",
+        "name": "The Alchemist's Secrets: Unveiling Occult Practices in Steampunk",
+        "start": "2023-03-25T16:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Improv: Late-Night Theatrical Games and Spontaneous Adventures",
+        "start": "2023-03-25T16:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Beneath the Gaslight: Late-Night Tales of Victorian London's Underbelly",
+        "start": "2023-03-25T16:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T19:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Crafting Props and Accessories: An Introduction to Cosplay Construction",
+        "start": "2023-03-25T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T17:30:00.000000+0000",
+        "location": "Main",
+        "name": "Aetheric Energy: Harnessing the Power of Steampunk Science",
+        "start": "2023-03-25T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Dieselpunk Delirium: Retro-futuristic Tales of Altered Timelines",
+        "start": "2023-03-25T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "The Steam Circus: Eclectic Performances and Musical Acts",
+        "start": "2023-03-25T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "The Aether Jazz Revival: Vintage Sounds of a Steampunk Era",
+        "start": "2023-03-25T17:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T18:15:00.000000+0000",
+        "location": "Live 2",
+        "name": "Gourmet Steampunk: Elevating Classic Dishes with Mechanical Innovation",
+        "start": "2023-03-25T17:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T19:00:00.000000+0000",
+        "location": "Live 7",
+        "name": "The Dark Side of Steampunk: Exploring Gothic Themes in the Genre",
+        "start": "2023-03-25T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T19:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Clockwork Beats: DJs Spinning Steampunk-Infused Tracks",
+        "start": "2023-03-25T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:00:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Gaming Quest: Interactive Adventure Game Incorporating Pop Culture References",
+        "start": "2023-03-25T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Two Kings",
+        "name": "Creative Writing Workshop: Crafting Steampunk Tales",
+        "start": "2023-03-25T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T19:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Vintage Victorian Photography: Steampunk-themed Photo Sessions",
+        "start": "2023-03-25T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Women in Steampunk",
+        "start": "2023-03-25T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T19:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Advanced Makeup Techniques: Prosthetics, Special Effects, and Body Painting",
+        "start": "2023-03-25T18:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T19:45:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steampunk Gaming Cosplay Contest: Showcasing Pop Culture Characters with a Steampunk Twist",
+        "start": "2023-03-25T18:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Pop Culture Quiz Show: Testing Knowledge of Pop Culture Trivia in a Victorian-style Game Show",
+        "start": "2023-03-25T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Advanced Armor Techniques: Detailing, Weathering, and Battle Damage",
+        "start": "2023-03-25T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Ghost Hunting: Late-Night Explorations of Haunted Locations",
+        "start": "2023-03-25T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Escape Room: Puzzle-solving Adventure in a Victorian Setting",
+        "start": "2023-03-25T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:30:00.000000+0000",
+        "location": "Live 5",
+        "name": "Goggle Gala: Steampunk Fashion Show and Costume Contest",
+        "start": "2023-03-25T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T20:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Cosplay Lip Sync Battle: Pop Culture-inspired Performances with a Steampunk Flair",
+        "start": "2023-03-25T19:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:30:00.000000+0000",
+        "location": "Live 3",
+        "name": "Aetheric Acoustics: Ethereal Melodies and Harmonies of Steampunk",
+        "start": "2023-03-25T19:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:00:00.000000+0000",
+        "location": "Live 7",
+        "name": "Goggles and Corsets: Fashion in Steampunk Locomotive Culture",
+        "start": "2023-03-25T19:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "World War II Redux: Crafting Dieselpunk Narratives of the Second World War",
+        "start": "2023-03-25T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:00:00.000000+0000",
+        "location": "Live 4",
+        "name": "Tales from the Steam Engine: Storytelling Session of Steampunk Adventures",
+        "start": "2023-03-25T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:00:00.000000+0000",
+        "location": "Main",
+        "name": "The Rise of the Airships: Crafting Alternate Aviation History",
+        "start": "2023-03-25T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T23:00:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "Neo-Victorian Vibes: Indie Bands Showcasing Steampunk-Inspired Originals",
+        "start": "2023-03-25T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Brass and Brews: Steampunk-inspired Beer and Food Pairings",
+        "start": "2023-03-25T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Cabinet of Curiosities: Late-Night Showcasing of Bizarre Steampunk Artifacts",
+        "start": "2023-03-25T20:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:30:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Cosplay Contest: Showcasing Retro-futuristic Attire",
+        "start": "2023-03-25T20:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:30:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Pattern Making for Cosplay: Designing Custom Templates for Complex Costumes",
+        "start": "2023-03-25T20:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T21:45:00.000000+0000",
+        "location": "Live 1",
+        "name": "The Victorian Gastronomy: Exploring Traditional Steampunk Recipes",
+        "start": "2023-03-25T20:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T23:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Fireside Tales: Storytelling Session of Spooky Steampunk Ghost Stories",
+        "start": "2023-03-25T21:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Cosplay 101: Getting Started in the World of Costume Play",
+        "start": "2023-03-25T21:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:00:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Karaoke Extravaganza: A Melodic Journey through Time",
+        "start": "2023-03-25T21:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:30:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steam Showcase: Displaying Steampunk Artistry and Creations",
+        "start": "2023-03-25T21:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T23:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "The Rise of Airships",
+        "start": "2023-03-25T21:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T23:00:00.000000+0000",
+        "location": "Live 7",
+        "name": "Steampunk Broadway: Showstopping Performances of Musical Theater Hits in a Victorian Style",
+        "start": "2023-03-25T21:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-25T22:45:00.000000+0000",
+        "location": "Live 3",
+        "name": "Brass and Whistles: A Musical Journey through Steampunk",
+        "start": "2023-03-25T21:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Video Game Tournament: Retro-Futuristic Battles in Virtual Worlds",
+        "start": "2023-03-25T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "The Steam Brigade: Steampunk Railways and Military Applications",
+        "start": "2023-03-25T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:30:00.000000+0000",
+        "location": "Main",
+        "name": "Clockwork Cabaret: Late-Night Musical Extravaganza with Steampunk Vibes",
+        "start": "2023-03-25T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Steampunk Showdown: Physical and Mental Duels in a Retro-Futuristic Arena",
+        "start": "2023-03-25T22:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Aetheric Anthems: Sing-along Concert Celebrating Steampunk Classics",
+        "start": "2023-03-25T22:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Dieselpunk Dystopias: Exploring Alternate History through Industrial Noir",
+        "start": "2023-03-25T22:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Artifacts",
+        "start": "2023-03-25T23:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T00:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Cosplay Photography Tips: Posing and Capturing Your Character in Action",
+        "start": "2023-03-25T23:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T01:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Clockwork Conundrums: Puzzles and Brainteasers in a Steampunk Contest",
+        "start": "2023-03-25T23:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T01:00:00.000000+0000",
+        "location": "Live 7",
+        "name": "Steampunk Fashion Showcase",
+        "start": "2023-03-26T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "Symphony of Gears: Classical Orchestra Performing Steampunk Compositions",
+        "start": "2023-03-26T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Parallel Dimensions: Exploring Multiverse Concepts in Alternate History",
+        "start": "2023-03-26T00:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T01:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "The Steampunk Paradox: Exploring the Intersection of Past and Future",
+        "start": "2023-03-26T00:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "The Great Convergence: Merging Steampunk and Dieselpunk in Alternate Timelines",
+        "start": "2023-03-26T00:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T01:00:00.000000+0000",
+        "location": "Main",
+        "name": "Exploring Steampunk Architecture: Blending Past and Future",
+        "start": "2023-03-26T00:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T01:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Steam Wars: Battling through Steampunk-inspired Game Show Challenges",
+        "start": "2023-03-26T00:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T05:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Photography",
+        "start": "2023-03-26T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Main",
+        "name": "Art of Steampunk Tattoo",
+        "start": "2023-03-26T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Live 7",
+        "name": "Gentleman's Dueling Academy: Learning",
+        "start": "2023-03-26T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T05:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Gears & Gadgets: Exploring Steampunk Technology",
+        "start": "2023-03-26T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:00:00.000000+0000",
+        "location": "Zenkaikon Online (online.zenkaikon.com)",
+        "name": "Steampunk Whodunit: Solving Pop Culture-inspired Mysteries in a Victorian Setting",
+        "start": "2023-03-26T01:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T03:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Steamy Spoken Word: Open Mic Night of Steampunk Poetry and Prose",
+        "start": "2023-03-26T01:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:30:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Robotics: Designing and Building Mechanical Marvels",
+        "start": "2023-03-26T01:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T02:45:00.000000+0000",
+        "location": "Main",
+        "name": "Steam & Gears: Unveiling the Power of Locomotive Technology",
+        "start": "2023-03-26T02:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T03:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "Gothic Steampunk Symphony: Dark and Atmospheric Orchestral Performance",
+        "start": "2023-03-26T02:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T03:15:00.000000+0000",
+        "location": "Live 2",
+        "name": "Armor and Armature: Introduction to Creating Cosplay Armor Pieces",
+        "start": "2023-03-26T02:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Victorian Vendetta: Strategic Game Show Set in a Steampunk World of Intrigue",
+        "start": "2023-03-26T02:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T03:15:00.000000+0000",
+        "location": "Main",
+        "name": "The Retro Lounge: Intimate Acoustic Performances in a Steampunk Setting",
+        "start": "2023-03-26T02:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "The Art of Alternate History: Creating Intriguing What-If Scenarios",
+        "start": "2023-03-26T03:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:30:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Disney Trivia: Testing Knowledge of Retro-Futuristic Disney Films and Characters",
+        "start": "2023-03-26T03:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:30:00.000000+0000",
+        "location": "Live 4",
+        "name": "Mad Science After Dark: Exploring Unorthodox Experiments in Steampunk",
+        "start": "2023-03-26T03:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T16:30:00.000000+0000",
+        "location": "Live 5",
+        "name": "Foamsmithing Fundamentals: Working with EVA Foam for Cosplay Armor",
+        "start": "2023-03-26T03:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T04:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steampunk Accessories: Handcrafted Jewelry and Gear",
+        "start": "2023-03-26T03:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T06:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Horror Cinema: Late-Night Screenings of Retro-Futuristic Frights",
+        "start": "2023-03-26T04:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T05:30:00.000000+0000",
+        "location": "Live 4",
+        "name": "The Steam Engine Symphony: Orchestral Performance of Steampunk-inspired Music",
+        "start": "2023-03-26T04:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T06:00:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Harry Potter: Enchanting Adventures in a Retro-Futuristic Wizarding World",
+        "start": "2023-03-26T04:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T05:45:00.000000+0000",
+        "location": "Live 2",
+        "name": "Cosplay Parade: Showcasing a Spectacle of Steampunk Characters",
+        "start": "2023-03-26T04:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T06:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Wizarding School: A Magical Journey in a Victorian Era",
+        "start": "2023-03-26T04:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T14:00:00.000000+0000",
+        "location": "Main",
+        "name": "Aetheric Auction: Steampunk-themed Auction Game Show with Bidding Battles",
+        "start": "2023-03-26T13:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T14:45:00.000000+0000",
+        "location": "Live 4",
+        "name": "Neo-Victorian Literature: Rediscovering the Steampunk Genre",
+        "start": "2023-03-26T13:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T15:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Aetheric Armory: Steampunk Weaponry Challenge Game Show",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:00:00.000000+0000",
+        "location": "Montgomery",
+        "name": "The Art of Steampunk Mixology: Crafting Victorian-inspired Cocktails",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:00:00.000000+0000",
+        "location": "Cosplay Repair",
+        "name": "Mechanical Music Melodies: Concert of Steampunk-inspired Musical Performances",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T20:00:00.000000+0000",
+        "location": "2nd Floor",
+        "name": "Steampunk Tea Time: Brewing the Perfect Cup with a Twist",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "Level 3",
+        "name": "Tea Dueling Tournament: A Victorian-inspired Duel of Steeped Beverages",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T15:45:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Film Screening: Showcasing Retro-futuristic Cinema",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:30:00.000000+0000",
+        "location": "Video Gaming",
+        "name": "The Clockwork Conundrum",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T15:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Late-Night Steampunk Gaming: Immersive Roleplaying Adventures in the Witching Hour",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T16:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Rewriting History: Crafting Alternate Realities in Steampunk",
+        "start": "2023-03-26T14:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T15:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Comic Convergence: Celebrating the Fusion of Pop Culture and Retro-Futurism",
+        "start": "2023-03-26T14:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T15:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "Steampunk Literary Salon: Engaging Discussions on Retro-Futuristic Literature",
+        "start": "2023-03-26T14:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T15:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Whistle and Steam: The Soundscape of Steampunk Railways",
+        "start": "2023-03-26T14:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Steampunk Astronomy: Discovering the Stars and Planets through a Retro Lens",
+        "start": "2023-03-26T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T16:00:00.000000+0000",
+        "location": "Live 4",
+        "name": "Victorian Voices: Vocal Ensembles Bringing Steampunk Tunes to Life",
+        "start": "2023-03-26T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "Live 3",
+        "name": "Steampunk Film Festival",
+        "start": "2023-03-26T15:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T16:30:00.000000+0000",
+        "location": "Live 1",
+        "name": "Aetheric Apothecary: Herbal Remedies and Potions in the Steampunk Age",
+        "start": "2023-03-26T15:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Noir: Crime, Mystery, and Intrigue in the Late-Night City",
+        "start": "2023-03-26T15:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T16:45:00.000000+0000",
+        "location": "Live 3",
+        "name": "The Enigmatic Engineers: Masterminds Behind Steampunk Locomotives",
+        "start": "2023-03-26T15:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T20:00:00.000000+0000",
+        "location": "Tabletop",
+        "name": "Gears in Harmony: Steampunk Vocal Ensembles",
+        "start": "2023-03-26T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "Mechanical Melodies: Electronic Music with Steampunk Flair",
+        "start": "2023-03-26T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:00:00.000000+0000",
+        "location": "Live 5",
+        "name": "Steampunk Couture",
+        "start": "2023-03-26T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "Steam Engines and Sustainability",
+        "start": "2023-03-26T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Pop Culture Art Exhibition: Showcasing Artworks Inspired by Pop Culture Icons",
+        "start": "2023-03-26T16:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:15:00.000000+0000",
+        "location": "Live 4",
+        "name": "The Clockwork Empire: Alternate Histories of Victorian Dominance",
+        "start": "2023-03-26T16:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:15:00.000000+0000",
+        "location": "Main",
+        "name": "Steampunk Superheroes: Cosplay Mashup of Comic Book and Retro-Futuristic Characters",
+        "start": "2023-03-26T16:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Clockwork Tales: Spooky Steampunk Stories for Late-Night Chills",
+        "start": "2023-03-26T16:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T17:45:00.000000+0000",
+        "location": "Live 1",
+        "name": "Steampunk Gaming Cosplay Parade: Procession of Pop Culture Characters with a Steampunk Flair",
+        "start": "2023-03-26T16:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:30:00.000000+0000",
+        "location": "Lobby Carpeted Stairs",
+        "name": "Brass & Beats: Electro-Swing Dance Party",
+        "start": "2023-03-26T17:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:15:00.000000+0000",
+        "location": "Live 3",
+        "name": "Mysteries of the Aether: Unraveling Paranormal Phenomena in Steampunk",
+        "start": "2023-03-26T17:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:30:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "The Great Steam Race: Team-based Competition of Physical and Mental Challenges",
+        "start": "2023-03-26T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T18:30:00.000000+0000",
+        "location": "Live 4",
+        "name": "Airship Adventure: Exploring the Skies in a Steampunk Zeppelin",
+        "start": "2023-03-26T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "Cosplay Meetup",
+        "name": "Steampunk Anime Costume Contest: Showcasing Pop Culture Characters with a Steampunk Twist",
+        "start": "2023-03-26T17:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:30:00.000000+0000",
+        "location": "Swap Meet",
+        "name": "The Gear Games: Multi-disciplinary Challenges with a Steampunk Twist",
+        "start": "2023-03-26T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "Live 2",
+        "name": "The Steam-Powered Band: Live Performance in a Victorian Era",
+        "start": "2023-03-26T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "4th Floor",
+        "name": "From Coal to Steam: The Evolution of Locomotive Fuels",
+        "start": "2023-03-26T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:00:00.000000+0000",
+        "location": "Live 1",
+        "name": "Choosing Your Character: Finding the Perfect Cosplay Inspiration",
+        "start": "2023-03-26T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:30:00.000000+0000",
+        "location": "Live 7",
+        "name": "Writing the Wild West: Steampunk Adventures on the Frontier",
+        "start": "2023-03-26T18:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:30:00.000000+0000",
+        "location": "Live 5",
+        "name": "Clockwork Curiosities: Unveiling Steampunk Collectibles",
+        "start": "2023-03-26T18:30:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T19:45:00.000000+0000",
+        "location": "Live 3",
+        "name": "Gears of Knowledge: Steampunk Trivia Challenge",
+        "start": "2023-03-26T18:45:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T20:00:00.000000+0000",
+        "location": "Live 4",
+        "name": "Cogs & Chords: Steampunk Rock and Alternative Sounds",
+        "start": "2023-03-26T19:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T20:15:00.000000+0000",
+        "location": "Live 1",
+        "name": "Aesthetics of Steampunk",
+        "start": "2023-03-26T19:15:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T20:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Steam-powered Sous Vide: Precision Cooking with a Retro Twist",
+        "start": "2023-03-26T20:00:00.000000+0000"
+    },
+    {
+        "finish": "2023-03-26T21:30:00.000000+0000",
+        "location": "Live 2",
+        "name": "Clockwork Journeys: Fictional Tales of Steampunk Train Adventures",
+        "start": "2023-03-26T20:30:00.000000+0000"
+    }
+]

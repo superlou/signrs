@@ -1,17 +1,17 @@
-export let resolution = [640, 480];
+export let resolution = [960, 540];
 export let multisampling = 1;
-
-// include("slide_manager.js");
-// include("ticker.js");
-// include("fps.js");
 
 import Fps from "fps.js";
 import Ticker from "ticker.js";
 import SlideManager from "slide_manager.js";
+import TextSlide from "text_slide.js";
+import EventSlide from "event_slide.js";
+import Guide from "guide.js";
 
-let fps = new Fps(540, 10, 20);
+let fps = new Fps(850, 10, 20);
 let ticker = new Ticker();
 let slideManager = new SlideManager();
+let guide = new Guide();
 
 let color = {
     black: new Color(0, 0, 0),
@@ -28,22 +28,38 @@ let font = {
     light: new Font("assets/Roboto-Thin.ttf"),
 }
 
-watch_json("slides.json", (data) => {
+let runningSlide = new EventSlide("Happening Now");
+
+watch_json("data/slides.json", (data) => {
     slideManager.clear();
+    slideManager.add(runningSlide);
+    
     data.forEach((slide) => {
-        slideManager.add(slide.title, slide.body, slide.duration);
+        let text_slide = new TextSlide(slide.title, slide.body, slide.duration);
+        slideManager.add(text_slide);
     })
 });
 
-watch_json("ticker.json", (data) => {
+watch_json("data/guide.json", (data) => {
+    guide.update(data);
+})
+
+watch_json("data/ticker.json", (data) => {
    ticker.setMessages(data.messages); 
 });
 
 export function init() {
-    console.log("init");
 }
 
+let i = 0;
+
 export function draw(dt) {
+    // Limit expensive calls until we have a way to run them in the background
+    if (i++ === 0) {
+        runningSlide.setItems(guide.running(new Date("2023-03-25T18:00:00.000000Z")));
+    }
+    i %= 180;
+    
     clear_screen(color.background);
     slideManager.draw(dt, font, color);
     ticker.draw(dt, font, color);

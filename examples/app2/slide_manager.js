@@ -2,9 +2,10 @@ export default class SlideManager {
     slides = [];
     activeIndex = 0;
     timeRemaining = null;
+    activeSlide = null;
     
-    add(title, text, duration) {
-        this.slides.push(new Slide(title, text, duration));    
+    add(slide) {
+        this.slides.push(slide);
     }
     
     draw(dt, font, color) {
@@ -12,46 +13,27 @@ export default class SlideManager {
             return;
         }
         
-        if (this.timeRemaining == null) {
-            this.timeRemaining = this.slides[this.activeIndex].duration;
+        if (this.activeSlide == null) {
+            this.activeSlide = this.slides[this.activeIndex];
+            this.activeSlide.reset();
         }
         
-        let slide = this.slides[this.activeIndex];
+        let slide = this.activeSlide;
         slide.draw(dt, font, color);
         
-        let duration = slide.duration;
-        let w = this.timeRemaining / duration * 640;
-        draw_rectangle(0, 0, 640, 4, color.black);
-        draw_rectangle(640 - w, 0, w, 4, color.white);
-        
-        this.timeRemaining -= dt;
-        
-        if (this.timeRemaining < 0) {
+        let w = slide.timeRemaining / slide.duration * 960;
+        draw_rectangle(0, 0, 960, 4, color.black);
+        draw_rectangle(960 - w, 0, w, 4, color.white);
+                
+        if (this.activeSlide.timeRemaining < 0) {
             this.activeIndex = (this.activeIndex + 1) % this.slides.length;
-            this.timeRemaining = this.slides[this.activeIndex].duration;
+            this.activeSlide = this.slides[this.activeIndex];
+            this.activeSlide.reset();
         }
     }
     
     clear() {
         this.slides = [];
         this.activeIndex = 0;
-        this.timeRemaining = null;
     }
-}
-
-class Slide {
-    constructor(title, text, duration) {
-        this.title = title;
-        this.text = text;
-        this.duration = duration;
-    }
-    
-    draw(dt, font, color) {        
-        draw_text(font.light, this.title, 20, 24, 64, color.title);
-        draw_text(font.normal, this.text, 20, 96, 18, color.body);        
-    }
-}
-
-function newSlideManager() {
-    return new SlideManager();
 }
