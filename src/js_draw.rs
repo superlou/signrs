@@ -201,16 +201,16 @@ fn clear_screen(
     _this: &JsValue, args: &[JsValue], _context: &mut Context
     ) -> JsResult<JsValue>
 {
-    if args.len() >= 1 {
+    if args.is_empty() {
+        graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreenBlack);
+    } else {
         let c = args[0].as_object()
             .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
             .downcast_ref::<JsColor>()
             .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
             .clone();
 
-        graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreen(c.into()));
-    } else {
-        graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreenBlack);
+        graphics_calls.borrow_mut().push(GraphicsCalls::ClearScreen(c.into()));        
     }
     
     Ok(JsValue::Undefined)    
@@ -411,8 +411,8 @@ fn watch_json(
     
     if run_first {
         let data = JsEnv::load_json(&full_path, context)?;
-        callback.clone().call(&JsValue::Undefined, &[data], context)?;
+        callback.call(&JsValue::Undefined, &[data], context)?;
     }
     
-    Ok(JsEnv::load_json(&full_path, context)?)
+    JsEnv::load_json(&full_path, context)
 }

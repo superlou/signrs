@@ -61,12 +61,12 @@ impl JsEnv {
         let app_path_str = app_path.to_str().unwrap();      
         context.global_object().set("app_path", app_path_str, true, &mut context).unwrap();        
         
-        register_fns_and_types(&mut context, &graphics_calls, &watches);        
+        register_fns_and_types(&mut context, graphics_calls, watches);        
         
         let console = Console::init(&mut context);
         context.register_global_property(Console::NAME, console, Attribute::all())?;
         
-        let mut main = app_path.clone().to_owned();
+        let mut main = app_path.to_path_buf();
         main.push("main.js");
         let source = Source::from_filepath(&main).unwrap();
         let module = Module::parse(source, None, &mut context)?;

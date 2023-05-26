@@ -95,7 +95,7 @@ pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<S
     
     thread::spawn(move || {          
         rouille::start_server("127.0.0.1:3000", move |request| {         
-            let response = rouille::match_assets(&request, "frontend/dist");
+            let response = rouille::match_assets(request, "frontend/dist");
             if response.is_success() {
                 return response;
             }

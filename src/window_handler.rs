@@ -56,7 +56,7 @@ pub struct SignWindowHandler {
 impl WindowHandler<String> for SignWindowHandler {
     fn on_start(&mut self, helper: &mut WindowHelper<String>, _info: WindowStartupInfo) {
         let sender = helper.create_user_event_sender();
-        crate::server::start_server(&self, Mutex::new(sender));
+        crate::server::start_server(self, Mutex::new(sender));
     }
     
     fn on_draw(&mut self, helper: &mut WindowHelper<String>, graphics: &mut Graphics2D) {

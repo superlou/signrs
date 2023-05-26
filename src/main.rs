@@ -20,7 +20,7 @@ fn main() {
     
     let app_path = &args[1];
     println!("Starting {}...", &app_path);
-    let mut handler = SignWindowHandler::new(&app_path);
+    let mut handler = SignWindowHandler::new(app_path);
     let resolution = handler.get_resolution().expect("Script didn't set resolution!");
     let multisampling = handler.get_multisampling().unwrap_or(1_u16);
     
