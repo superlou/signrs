@@ -1,7 +1,7 @@
-var resolution = [1280, 720];
-var multisampling = 1;
+export let resolution = [1280, 720];
+export let multisampling = 1;
 
-include("date.js");
+import { fmt_clock } from "date.js";
 
 let black = new Color(0.0, 0.0, 0.0);
 let green = new Color(0.0, 1.0, 0.0, 0.8);
@@ -20,9 +20,9 @@ data = watch_json("text.json", (new_data) => {
   data = new_data;
 });
 
-function init() { }
+export function init() { }
 
-function draw(dt) {
+export function draw(dt) {
   t += dt;
   let fps = 0.1 * (1 / dt) + 0.9 * prev_fps;
   prev_fps = fps;

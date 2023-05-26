@@ -1,4 +1,4 @@
-function fmt_clock(date) {
+export function fmt_clock(date) {
   let h = date.getHours();
   let m = date.getMinutes();
   let s = date.getSeconds();
