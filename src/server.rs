@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::thread;
 
-use rouille::{Response, router, Request, RequestBody};
+use rouille::{Response, router, Request};
 use serde::Serialize;
 use speedy2d::window::UserEventSender;
 use walkdir::WalkDir;

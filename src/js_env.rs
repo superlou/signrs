@@ -18,7 +18,6 @@ use crate::js_draw::{register_fns_and_types, GraphicsCalls};
 pub struct JsEnv {
     context: Context<'static>,
     module: Module,
-    app_path: PathBuf,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
 }
 
@@ -33,7 +32,6 @@ impl JsEnv {
         Ok(JsEnv {
             context,
             module,
-            app_path: app_path.to_owned(),
             graphics_calls,
         })
     }

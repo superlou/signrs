@@ -10,14 +10,12 @@ use boa_engine::JsValue;
 use boa_engine::object::builtins::JsFunction;
 use notify::{Watcher, RecursiveMode};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
-use speedy2d::shape::Rectangle;
 use speedy2d::window::{
     WindowHandler, WindowHelper, WindowStartupInfo,
     MouseButton, WindowFullscreenMode
 };
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
-use speedy2d::font::FormattedTextBlock;
 use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
@@ -52,7 +50,7 @@ pub struct SignWindowHandler {
     watcher: Box<dyn Watcher>,
     
     file_change_rx: mpsc::Receiver<PathBuf>,
-    file_change_tx: mpsc::Sender<PathBuf>,
+    _file_change_tx: mpsc::Sender<PathBuf>,
 }
 
 impl WindowHandler<String> for SignWindowHandler {
@@ -216,7 +214,7 @@ impl SignWindowHandler {
             image_handles: Rc::new(RefCell::new(HashMap::new())),
             watches,
             watcher: Box::new(watcher),
-            file_change_tx: tx,
+            _file_change_tx: tx,
             file_change_rx: rx,
         };
         
