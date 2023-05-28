@@ -54,7 +54,7 @@ export default class EventSlide {
   }
 }
 
-function fmtTime(date) {
+export function fmtTime(date) {
   let h = date.getHours();
   let m = date.getMinutes();
   let ampm = "am";
@@ -74,7 +74,7 @@ function fmtTime(date) {
   return `${h_str}:${m_str}`;
 }
 
-function fmtAmPm(date) {
+export function fmtAmPm(date) {
   if (date.getHours() >= 12) {
     return "pm";
   } else {
