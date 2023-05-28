@@ -81,6 +81,6 @@ export function draw(dt) {
     fps.draw(dt, font, color);
     
     with_offset(960 - 150, 540 - 50, () => {
-        clock.draw(debug.now, 150, 50, 32, font.normal, color.white, color.body);
+        clock.draw(now, 150, 50, 32, font.normal, color.white, color.body);
     });
 }
