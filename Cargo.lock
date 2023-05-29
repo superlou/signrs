@@ -56,6 +56,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "android-tzdata"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e999941b234f3131b00bc13c22d06e8c5ff726d1b6318ac7eb276997bbb4fef0"
+
+[[package]]
 name = "android_glue"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -133,7 +139,7 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "boa_ast"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "bitflags 2.3.1",
  "boa_interner",
@@ -146,7 +152,7 @@ dependencies = [
 [[package]]
 name = "boa_engine"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "bitflags 2.3.1",
  "boa_ast",
@@ -184,7 +190,7 @@ dependencies = [
 [[package]]
 name = "boa_gc"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "boa_macros",
  "boa_profiler",
@@ -194,7 +200,7 @@ dependencies = [
 [[package]]
 name = "boa_icu_provider"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "icu_collections",
  "icu_normalizer",
@@ -207,7 +213,7 @@ dependencies = [
 [[package]]
 name = "boa_interner"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "boa_gc",
  "boa_macros",
@@ -222,7 +228,7 @@ dependencies = [
 [[package]]
 name = "boa_macros"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -233,7 +239,7 @@ dependencies = [
 [[package]]
 name = "boa_parser"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "bitflags 2.3.1",
  "boa_ast",
@@ -253,12 +259,12 @@ dependencies = [
 [[package]]
 name = "boa_profiler"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 
 [[package]]
 name = "boa_runtime"
 version = "0.16.0"
-source = "git+https://github.com/boa-dev/boa.git#67c5652911582774ad166bb8869991587a7e7acf"
+source = "git+https://github.com/boa-dev/boa.git#c013caca22497f3a6637b442ac84bb102900d23c"
 dependencies = [
  "boa_engine",
  "boa_gc",
@@ -353,13 +359,13 @@ dependencies = [
 
 [[package]]
 name = "chrono"
-version = "0.4.24"
+version = "0.4.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e3c5919066adf22df73762e50cffcde3a758f2a848b113b586d1f86728b673b"
+checksum = "fdbc37d37da9e5bce8173f3a41b71d9bf3c674deebbaceacd0ebdabde76efb03"
 dependencies = [
+ "android-tzdata",
  "iana-time-zone",
  "js-sys",
- "num-integer",
  "num-traits",
  "time 0.1.45",
  "wasm-bindgen",
@@ -1663,9 +1669,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.17.1"
+version = "1.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
+checksum = "9670a07f94779e00908f3e686eab508878ebb390ba6e604d3a284c00e8d0487b"
 dependencies = [
  "atomic-polyfill",
  "critical-section",

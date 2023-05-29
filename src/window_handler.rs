@@ -94,6 +94,8 @@ impl WindowHandler<String> for SignWindowHandler {
                 Ok(mut script_env) => match script_env.call_init() {
                     Ok(_) => {
                         self.script_env = script_env;
+                        self.draw_offset_stack.clear();
+                        self.draw_offset = (0., 0.).into();
                         println!("Reloaded script environment.");
                     },
                     Err(err) => { dbg!(&err); },
@@ -103,6 +105,7 @@ impl WindowHandler<String> for SignWindowHandler {
         }
         
         // Call script draw function
+        self.script_env.clear_graphics_calls();
         if let Err(err) = self.script_env.call_draw(dt) {
             println!("{}", err);
         }
@@ -141,7 +144,6 @@ impl WindowHandler<String> for SignWindowHandler {
                 }
             }
         }
-        self.script_env.clear_graphics_calls();
         
         helper.request_redraw();
     }

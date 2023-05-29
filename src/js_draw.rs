@@ -422,6 +422,7 @@ fn with_offset(
     graphics_calls.borrow_mut().push(
         GraphicsCalls::PushOffset((x, y).into())
     );
+
     func.call(this, args, context)?;
     graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset());                
     Ok(JsValue::Undefined)
