@@ -30,6 +30,8 @@ let font = {
     light: new Font("assets/Roboto-Thin.ttf"),
 }
 
+let background = new Image("assets/clock_gears.jpg");
+
 let runningSlide = new EventSlide("Happening Now");
 
 watch_json("data/slides.json", (data) => {
@@ -76,6 +78,9 @@ export function draw(dt) {
     i %= 180;
     
     clear_screen(color.background);
+    
+    draw_image(background, 0, 0, 960, 647, 0.2);
+    
     slideManager.draw(dt, font, color);
     ticker.draw(dt, font, color);
     fps.draw(dt, font, color);
