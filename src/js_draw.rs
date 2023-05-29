@@ -73,10 +73,28 @@ impl From<JsColor> for Color {
     }
 }
 
-#[derive(Debug, Trace, Finalize, Clone)]
+#[derive(Trace, Finalize, Clone)]
 struct JsFont {
     #[unsafe_ignore_trace]
     font: Font,
+    #[unsafe_ignore_trace]
+    cache: HashMap<BlockCacheKey, Rc<FormattedTextBlock>>,
+    test: i32,
+}
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
+struct BlockCacheKey {
+    text: String,
+    scale: i32,
+}
+
+impl BlockCacheKey {
+    fn new(text: &str, scale: f32) -> Self {
+        BlockCacheKey {
+            text: text.to_owned(),
+            scale: (scale * 100.) as i32,
+        }
+    }
 }
 
 impl Class for JsFont {
@@ -93,12 +111,39 @@ impl Class for JsFont {
         
         let bytes = std::fs::read(full_path).unwrap();
         let font = Font::new(&bytes).unwrap();
+        let cache = HashMap::new();        
         
-        Ok(JsFont{font})
+        Ok(JsFont{font, cache, test: 10})
     }
     
-    fn init(_class: &mut ClassBuilder) -> JsResult<()> {
+    fn init(class: &mut ClassBuilder) -> JsResult<()> {
+        class.method("cacheLength", 0, NativeFunction::from_fn_ptr(Self::cache_length));
         Ok(())
+    }
+}
+
+impl JsFont {   
+    // todo Cold cache items should be pruned eventually
+    fn layout_text(&mut self, text: &str, scale: f32) -> Rc<FormattedTextBlock> {
+        let key = BlockCacheKey::new(text, scale);
+                               
+        match self.cache.get(&key) {
+            Some(block) => block.clone(),
+            None => {
+                let block = self.font.layout_text(text, scale, TextOptions::new());
+                self.cache.insert(key, block.clone());
+                block
+            }
+        }
+    }
+    
+    fn cache_length(this: &JsValue, _: &[JsValue], _: &mut Context<'_>) -> JsResult<JsValue> {
+        if let Some(object) = this.as_object() {
+            if let Some(js_font) = object.downcast_ref::<JsFont>() {
+                return Ok(JsValue::Integer(js_font.cache.len() as i32));
+            }
+        }
+        Err(JsNativeError::typ().with_message("'this' is not a JsFont object").into())
     }
 }
 
@@ -250,11 +295,10 @@ fn draw_text(
         return Err(JsNativeError::typ().with_message("Too few arguments for draw_text").into());
     }
 
-    let js_font = args[0].as_object()
+    let mut js_font = args[0].as_object()
         .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
-        .downcast_ref::<JsFont>()
-        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
-        .clone();
+        .downcast_mut::<JsFont>()
+        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?;
         
     let text = args[1].try_js_into::<String>(context)?;   
     let x = args[2].try_js_into::<f64>(context)? as f32;
@@ -267,7 +311,7 @@ fn draw_text(
         .ok_or(JsNativeError::typ().with_message("Expected a Color"))?
         .clone();
                                             
-    let block = js_font.font.layout_text(&text, s, TextOptions::new());
+    let block = js_font.layout_text(&text, s);
     graphics_calls.borrow_mut().push(
         GraphicsCalls::DrawText((x, y).into(), c.into(), block)
     );
@@ -281,15 +325,15 @@ fn size_text(_this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResu
         return Err(JsNativeError::typ().with_message("Too few arguments for size_text").into());
     }
     
-    let js_font = args[0].as_object()
+    let mut js_font = args[0].as_object()
         .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
-        .downcast_ref::<JsFont>()
-        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?
-        .clone();    
+        .downcast_mut::<JsFont>()
+        .ok_or(JsNativeError::typ().with_message("Expected a Font"))?;
+
     let text = args[1].try_js_into::<String>(context)?;
     let s = args[2].try_js_into::<f64>(context)? as f32;
     
-    let block = js_font.font.layout_text(&text, s, TextOptions::new());
+    let block = js_font.layout_text(&text, s);
     let size = block.size();
     
     let array = JsArray::new(context);
