@@ -12,6 +12,8 @@ use boa_engine::object::builtins::{JsArray, JsFunction};
 use boa_engine::property::{Attribute, PropertyKey};
 use boa_engine::value::TryFromJs;
 use boa_runtime::Console;
+use hostname;
+use local_ip_address::local_ip;
 
 use crate::js_draw::{register_fns_and_types, GraphicsCalls};
 
@@ -59,7 +61,19 @@ impl JsEnv {
         let mut context = Context::builder().module_loader(dyn_loader).build()?;
         
         let app_path_str = app_path.to_str().unwrap();      
-        context.global_object().set("app_path", app_path_str, true, &mut context).unwrap();        
+        context.global_object().set("app_path", app_path_str, true, &mut context)?;
+        
+        let hostname = match hostname::get() {
+            Ok(str) => str.to_str().unwrap_or("(unknown)").to_owned(),
+            Err(_) => "(unknown)".to_owned(),
+        };
+        context.global_object().set("hostname", hostname, true, &mut context)?;
+        
+        let local_ip = match local_ip() {
+            Ok(ip) => ip.to_string(),
+            Err(_) => "(unknown)".to_owned(),
+        };
+        context.global_object().set("localIp", local_ip, true, &mut context)?;
         
         register_fns_and_types(&mut context, graphics_calls, watches);        
         
