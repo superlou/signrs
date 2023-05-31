@@ -423,9 +423,9 @@ fn with_offset(
         GraphicsCalls::PushOffset((x, y).into())
     );
 
-    func.call(this, args, context)?;
-    graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset());                
-    Ok(JsValue::Undefined)
+    let call_result = func.call(this, args, context);
+    graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset());
+    call_result
 }
 
 fn watch_json(
