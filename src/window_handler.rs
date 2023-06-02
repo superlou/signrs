@@ -20,8 +20,7 @@ use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
 use crate::iter_util::iter_unique;
-use crate::js_env::JsEnv;
-use crate::js_draw::GraphicsCalls;
+use crate::js_env::{JsEnv, GraphicsCalls};
 
 #[derive(Error, Debug)]
 enum SignError {

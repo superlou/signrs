@@ -5,7 +5,6 @@ mod server;
 mod iter_util;
 mod window_handler;
 mod js_env;
-mod js_draw;
 use window_handler::SignWindowHandler;
 
 const HELP: &str = "\
