@@ -1,6 +1,5 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fs;
 use std::path::PathBuf;
 use std::rc::Rc;
 
@@ -39,10 +38,9 @@ fn watch_json(
     let path = args[0].try_js_into::<String>(context)?;
     full_path.push(path);
     
-    let Ok(canonical_path) = fs::canonicalize(&full_path) else {return Ok(JsValue::Undefined)};
     let callback = args[1].try_js_into::<JsFunction>(context)?;
     // todo Keeping the callback outside the JsEnv seems to cause core dump on quit
-    watches.borrow_mut().insert(canonical_path, callback.clone());
+    watches.borrow_mut().insert(full_path.clone(), callback.clone());
     
     let run_first = match args.get(2) {
         Some(arg) => arg.try_js_into::<bool>(context)?,

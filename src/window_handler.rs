@@ -185,13 +185,15 @@ impl SignWindowHandler {
     pub fn new<P: AsRef<Path>>(app_root: P) -> Self {       
         let (tx, rx) = mpsc::channel();
         let tx_for_watcher = tx.clone();
-         
+        
         let mut watcher = notify::recommended_watcher(move |res: Result<notify::Event, notify::Error>| {
             match res {
                 Ok(event) => match event.kind {
                     notify::EventKind::Modify(_) => {
                       for path_buf in event.paths {
-                          let _ = tx_for_watcher.send(path_buf);
+                          let cwd = std::env::current_dir().unwrap();
+                          let path = path_buf.strip_prefix(&cwd).unwrap();
+                          let _ = tx_for_watcher.send(path.to_owned());
                       }
                     },
                     _ => (),
