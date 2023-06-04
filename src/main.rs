@@ -1,5 +1,3 @@
-use std::env;
-
 use speedy2d::Window;
 use speedy2d::window::{WindowCreationOptions, WindowSize};
 
@@ -7,18 +5,48 @@ mod server;
 mod iter_util;
 mod window_handler;
 mod js_env;
-mod js_draw;
 use window_handler::SignWindowHandler;
 
-fn main() { 
-    let args: Vec<String> = env::args().collect();
+const HELP: &str = "\
+signrs digital signage application player
+
+USAGE:
+  signrs [APPLICATION]
+
+FLAGS:
+  -h, --help       Prints help information
+";
+
+#[derive(Debug)]
+struct SignArgs {
+    app_path: String,
+}
+
+fn parse_args() -> Result<SignArgs, pico_args::Error> {
+    let mut pargs = pico_args::Arguments::from_env();
     
-    if args.len() < 2 {
-        println!("No application specified!");
-        return;
+    if pargs.contains(["-h", "--help"]) {
+        print!("{}", HELP);
+        std::process::exit(0);
     }
     
-    let app_path = &args[1];
+    let args = SignArgs {
+        app_path: pargs.free_from_str()?,
+    };
+    
+    Ok(args)
+}
+
+fn main() { 
+    let args = match parse_args() {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            std::process::exit(1);
+        }
+    };
+    
+    let app_path = args.app_path;
     println!("Starting {}...", &app_path);
     let mut handler = SignWindowHandler::new(app_path);
     let resolution = handler.get_resolution().expect("Script didn't set resolution!");
