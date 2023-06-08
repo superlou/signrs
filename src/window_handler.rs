@@ -86,7 +86,7 @@ impl WindowHandler<String> for SignWindowHandler {
                 _ => {},
             }
         }
-        
+               
         if reload_script_env {
             let root_path = self.root_path.lock().unwrap().clone();
             match JsEnv::new(&root_path, &self.watches) {
@@ -104,7 +104,6 @@ impl WindowHandler<String> for SignWindowHandler {
         }
         
         // Call script draw function
-        self.script_env.clear_graphics_calls();
         if let Err(err) = self.script_env.call_draw(dt) {
             println!("{}", err);
         }
@@ -140,9 +139,17 @@ impl WindowHandler<String> for SignWindowHandler {
                 }
                 GraphicsCalls::PopOffset() => {
                     self.draw_offset -= self.draw_offset_stack.pop().unwrap_or(Vec2::ZERO);
+                },
+                GraphicsCalls::SetResolution(uvec2) => {
+                    graphics.set_resolution(*uvec2);
+                    helper.set_size_pixels(uvec2);
                 }
             }
         }
+        
+        // Clear graphics calls only once we've handled them, including calls from
+        // initialization.
+        self.script_env.clear_graphics_calls();  
         
         helper.request_redraw();
     }
@@ -223,19 +230,11 @@ impl SignWindowHandler {
         
         if let Err(err) = handler.script_env.call_init() {
             dbg!(err);
-            panic!("Unable to initialize script environment!");
         }
 
         handler
     }
-    
-    pub fn get_resolution(&mut self) -> Option<(u32, u32)> {
-        match self.script_env.get_array::<u32, _>("resolution") {
-            Ok(a) if a.len() >= 2 => Some((a[0], a[1])),
-            _ => None,
-        }
-    }
-    
+       
     pub fn get_multisampling(&mut self) -> Option<u16> {
         match self.script_env.get_value::<i32, _>("multisampling") {
             Ok(value) => Some(value as u16),

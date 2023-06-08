@@ -1,4 +1,3 @@
-export let resolution = [960, 540];
 export let multisampling = 1;
 
 import Fps from "fps.js";
@@ -63,6 +62,7 @@ watch_json("data/debug.json", data => {
 });
 
 export function init() {
+    set_resolution(960, 540);
 }
 
 let i = 0;

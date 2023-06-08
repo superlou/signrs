@@ -12,7 +12,7 @@ use boa_engine::value::TryFromJs;
 use boa_gc::{Trace, Finalize};
 use boa_runtime::Console;
 use speedy2d::color::Color;
-use speedy2d::dimen::Vec2;
+use speedy2d::dimen::{Vec2, UVec2};
 use speedy2d::shape::Rectangle;
 use speedy2d::font::{Font, TextOptions, TextLayout, FormattedTextBlock};
 
@@ -25,6 +25,7 @@ pub enum GraphicsCalls {
     DrawRectangleImageTinted(Rectangle, String, Color),
     PushOffset(Vec2),
     PopOffset(),
+    SetResolution(UVec2),
 }
 
 #[derive(Debug, Trace, Finalize, TryFromJs, Clone)]
@@ -226,6 +227,15 @@ pub fn register_fns_and_types(
             })
         ).unwrap();
     }
+    
+    let graphics_calls_ = graphics_calls.clone();
+    unsafe {
+        context.register_global_callable(
+            "set_resolution", 1, NativeFunction::from_closure(move |this, args, context| {
+                set_resolution(&graphics_calls_, this, args, context)
+            })
+        ).unwrap();
+    }
 }
 
 fn clear_screen(
@@ -413,4 +423,23 @@ fn with_offset(
     let call_result = func.call(this, args, context);
     graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset());
     call_result
+}
+
+fn set_resolution(
+    graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>,
+    _this: &JsValue, args: &[JsValue], context: &mut Context
+    ) -> JsResult<JsValue>
+{
+    if args.len() < 2 {
+        return Err(JsNativeError::typ().with_message("Too few arguments for set_resolution").into());
+    }
+    
+    let x = args[0].try_js_into::<f64>(context)? as u32;
+    let y = args[1].try_js_into::<f64>(context)? as u32;
+    
+    graphics_calls.borrow_mut().push(
+        GraphicsCalls::SetResolution((x, y).into())
+    );
+
+    Ok(JsValue::Undefined)
 }
