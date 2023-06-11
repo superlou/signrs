@@ -15,6 +15,9 @@ USAGE:
 
 FLAGS:
   -h, --help       Prints help information
+
+OPTIONS:
+  --multisampling  Sets the multisampling level [default: 1]
 ";
 
 #[derive(Debug)]

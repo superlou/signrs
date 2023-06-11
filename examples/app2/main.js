@@ -1,5 +1,3 @@
-export let multisampling = 1;
-
 import Fps from "fps.js";
 import Ticker from "ticker.js";
 import SlideManager from "slide_manager.js";
