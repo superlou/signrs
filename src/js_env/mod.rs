@@ -24,11 +24,19 @@ pub struct JsEnv {
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
 }
 
+const FALLBACK_SCRIPT: &str = r###"
+    export function init() {}
+
+    export function draw(dt) {
+        clear_screen(new Color(0, 0, 0));
+    }
+"###;
+
 impl JsEnv {
     pub fn new(
         app_path: &Path,
         watches: &Rc<RefCell<HashMap<PathBuf, JsFunction>>>) -> JsResult<Self>
-{
+    {
         let graphics_calls = Rc::new(RefCell::new(vec![]));
         let (context, module) = JsEnv::create_context(app_path, &graphics_calls, watches)?;
         
@@ -37,6 +45,31 @@ impl JsEnv {
             module,
             graphics_calls,
         })
+    }
+    
+    /// Create a simple JsEnv that should never fail
+    pub fn new_fallback() -> Self
+    {
+        let graphics_calls = Rc::new(RefCell::new(vec![]));
+        let mut context = Context::default();
+        graphics::register_fns_and_types(&mut context, &graphics_calls);
+        let source = Source::from_bytes(FALLBACK_SCRIPT);
+        let module = Module::parse(source, None, &mut context).unwrap();
+        let promise = module.load_link_evaluate(&mut context).unwrap();
+        context.run_jobs();
+
+        if let PromiseState::Rejected(err) = promise.state().unwrap() {
+            println!("Promise error: {}", err.display());
+            panic!();
+        } else {
+            println!("Success");
+        }        
+        
+        JsEnv {
+            context,
+            module,
+            graphics_calls,
+        }
     }
     
     pub fn graphics_calls(&self) -> &Rc<RefCell<Vec<GraphicsCalls>>> {

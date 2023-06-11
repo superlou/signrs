@@ -212,9 +212,17 @@ impl SignWindowHandler {
         watcher.watch(app_root.as_ref(), RecursiveMode::Recursive).unwrap();
              
         let watches = Rc::new(RefCell::new(HashMap::new()));
-             
-        let mut handler = SignWindowHandler {
-            script_env: JsEnv::new(app_root.as_ref(), &watches).unwrap(),
+
+        let mut script_env = JsEnv::new(app_root.as_ref(), &watches).unwrap_or_else(|err| {
+            dbg!(err);
+            JsEnv::new_fallback()
+        });
+        if let Err(err) = script_env.call_init() {
+            dbg!(err);
+        }             
+                     
+        SignWindowHandler {
+            script_env,
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
             is_fullscreen: Arc::new(Mutex::new(false)),
@@ -226,13 +234,7 @@ impl SignWindowHandler {
             watcher: Box::new(watcher),
             _file_change_tx: tx,
             file_change_rx: rx,
-        };
-        
-        if let Err(err) = handler.script_env.call_init() {
-            dbg!(err);
         }
-
-        handler
     }
        
     pub fn get_multisampling(&mut self) -> Option<u16> {
