@@ -1,9 +1,10 @@
-export let resolution = [960, 540];
-export let multisampling = 1;
+let resolution = [960, 540];
 
 import Fps from "fps.js";
 
-export function init() {}
+export function init() {
+  set_resolution(...resolution);
+}
 
 let black = new Color(0, 0, 0);
 let white = new Color(1, 1, 1);

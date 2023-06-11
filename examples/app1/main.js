@@ -1,6 +1,4 @@
-export let resolution = [1280, 720];
-export let multisampling = 1;
-
+let resolution = [1280, 720];
 import { fmt_clock } from "date.js";
 
 let black = new Color(0.0, 0.0, 0.0);
@@ -20,7 +18,9 @@ data = watch_json("text.json", (new_data) => {
   data = new_data;
 });
 
-export function init() { }
+export function init() {
+  set_resolution(...resolution);
+}
 
 export function draw(dt) {
   t += dt;
