@@ -23,7 +23,7 @@ Build and run the player using `cargo run --release <path to application>`. Exam
 
 To see the avaialable command-line arguments run:
 
-`cargo run --release -- -help`
+`cargo run --release -- --help`
 
 ## Creating an Application
 
