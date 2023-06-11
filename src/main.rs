@@ -20,6 +20,7 @@ FLAGS:
 #[derive(Debug)]
 struct SignArgs {
     app_path: String,
+    multisampling: u16,
 }
 
 fn parse_args() -> Result<SignArgs, pico_args::Error> {
@@ -32,6 +33,7 @@ fn parse_args() -> Result<SignArgs, pico_args::Error> {
     
     let args = SignArgs {
         app_path: pargs.free_from_str()?,
+        multisampling: pargs.opt_value_from_str("--multisampling")?.unwrap_or(1),
     };
     
     Ok(args)
@@ -47,20 +49,17 @@ fn main() {
     };
     
     let app_path = args.app_path;
-    println!("Starting {}...", &app_path);
-    let mut handler = SignWindowHandler::new(app_path);
-    // let resolution = handler.get_resolution().expect("Script didn't set resolution!");
-    let multisampling = handler.get_multisampling().unwrap_or(1_u16);
-    
-    // println!("Resolution: {}x{}", resolution.0, resolution.1);
-    println!("Multisampling: {}", multisampling);
+    let handler = SignWindowHandler::new(&app_path);
 
     let options = WindowCreationOptions::new_windowed(WindowSize::PhysicalPixels((640, 480).into()), None)
-                    .with_multisampling(multisampling).with_fixed_resolution(true);
+                    .with_multisampling(args.multisampling)
+                    .with_fixed_resolution(true);
     
     let window: Window<String> = Window::new_with_user_events("Title", options)
         .expect("Failed to create window!");
     
+    println!("Starting {}...", &app_path);
+    println!("Multisampling: {}", args.multisampling);
     window.run_loop(handler);    
     
 }

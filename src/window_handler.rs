@@ -236,13 +236,6 @@ impl SignWindowHandler {
             file_change_rx: rx,
         }
     }
-       
-    pub fn get_multisampling(&mut self) -> Option<u16> {
-        match self.script_env.get_value::<i32, _>("multisampling") {
-            Ok(value) => Some(value as u16),
-            Err(_) => None,
-        }
-    }
     
     fn get_image_handle(&mut self, path_string: &str, graphics: &mut Graphics2D) -> ImageHandle {
         let mut created = false;

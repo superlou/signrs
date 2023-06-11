@@ -160,7 +160,7 @@ impl JsEnv {
         Ok(())
     }
     
-    pub fn get_value<T, K>(&mut self, key: K) -> Result<T, JsError>
+    pub fn _get_value<T, K>(&mut self, key: K) -> Result<T, JsError>
         where K: Into<PropertyKey>,
               T: TryFromJs
     {       
@@ -171,7 +171,7 @@ impl JsEnv {
         Ok(value)
     }
 
-    pub fn get_array<T, K>(&mut self, key: K) -> Result<Vec<T>, JsError>
+    pub fn _get_array<T, K>(&mut self, key: K) -> Result<Vec<T>, JsError>
         where K: Into<PropertyKey>,
               T: TryFromJs
     {       
