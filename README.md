@@ -30,14 +30,14 @@ To see the avaialable command-line arguments run:
 Every application needs to have a "main.js" file, and export an `init` and `draw` function. The minimum application looks like this:
 
 ```js
-    export function init() {
-        set_resolution(960, 540);
-    }
+export function init() {
+    set_resolution(960, 540);
+}
 
-    export function draw(dt) {
-        // Called once per frame with dt being the time between calls
-        clear_screen(new Color(0, 0, 0));
-    }
+export function draw(dt) {
+    // Called once per frame with dt being the time between calls
+    clear_screen(new Color(0, 0, 0));
+}
 ```
 
 ### Signage Application API
