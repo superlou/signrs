@@ -7,6 +7,7 @@ use boa_engine::{Context, JsNativeError, JsResult, JsValue, NativeFunction};
 use boa_engine::object::builtins::JsFunction;
 
 use crate::js_env::JsEnv;
+use crate::iter_util::iter_unique;
 
 pub fn register_fns_and_types(
     context: &mut Context,
@@ -53,4 +54,53 @@ fn watch_json(
     }
     
     JsEnv::load_json(&full_path, context)
+}
+
+impl JsEnv {
+    pub fn handle_file_changes(&mut self) {
+        let mut reload_script_env = false;
+        
+        for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
+            // Check if it's a watched file with a callback
+            if let Some(js_fn) = self.watches.borrow().get(&changed_path_buf) {               
+                match JsEnv::load_json(&changed_path_buf, &mut self.context) {
+                    Ok(data) => {
+                        if let Err(err) = js_fn.call(&JsValue::Undefined, &[data], &mut self.context) {
+                            dbg!(&err);
+                        }
+                    },
+                    Err(err) => {dbg!(&err);},
+                }
+            }
+            
+            // If not explicitly watched, do other updates
+            let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());            
+            match extension {
+                Some(ext) if ext == "js" => {
+                    reload_script_env = true;
+                },
+                _ => {},
+            }
+        }
+               
+        if reload_script_env {
+            self.try_before_reload();
+        }
+    }
+    
+    fn try_before_reload(&mut self) {
+        match JsEnv::create_context(&self.app_path, &self.graphics_calls, &self.watches) {
+            Ok((mut context, module)) => {
+                match JsEnv::call_module_init(&module, &mut context) {
+                    Ok(_) => {
+                        self.context = context;
+                        self.module = module;
+                        println!("Reloaded script environment.");
+                    },
+                    Err(err) => { dbg!(&err); },
+                };
+            },
+            Err(err) => { dbg!(&err); },
+        };        
+    }
 }

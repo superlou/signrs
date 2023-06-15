@@ -1,14 +1,10 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::mpsc;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::{Instant, Duration};
 
-use boa_engine::JsValue;
-use boa_engine::object::builtins::JsFunction;
-use notify::{Watcher, RecursiveMode};
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
 use speedy2d::window::{
     WindowHandler, WindowHelper, WindowStartupInfo,
@@ -19,7 +15,6 @@ use speedy2d::color::Color;
 use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
-use crate::iter_util::iter_unique;
 use crate::js_env::{JsEnv, GraphicsCalls};
 
 #[derive(Error, Debug)]
@@ -42,14 +37,6 @@ pub struct SignWindowHandler {
     draw_offset: Vec2,
     pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
-    #[allow(deprecated)]
-    watches: Rc<RefCell<HashMap<PathBuf, JsFunction>>>,
-    
-    #[allow(dead_code)] // Required to keep watcher in scope
-    watcher: Box<dyn Watcher>,
-    
-    file_change_rx: mpsc::Receiver<PathBuf>,
-    _file_change_tx: mpsc::Sender<PathBuf>,
 }
 
 impl WindowHandler<String> for SignWindowHandler {
@@ -61,47 +48,8 @@ impl WindowHandler<String> for SignWindowHandler {
     fn on_draw(&mut self, helper: &mut WindowHelper<String>, graphics: &mut Graphics2D) {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
-        
-        let mut reload_script_env = false;
-        
-        for changed_path_buf in iter_unique(self.file_change_rx.try_iter()) {
-            // Check if it's a watched file with a callback
-            if let Some(js_fn) = self.watches.borrow().get(&changed_path_buf) {               
-                match JsEnv::load_json(&changed_path_buf, self.script_env.context_mut()) {
-                    Ok(data) => {
-                        if let Err(err) = js_fn.call(&JsValue::Undefined, &[data], self.script_env.context_mut()) {
-                            dbg!(&err);
-                        }
-                    },
-                    Err(err) => {dbg!(&err);},
-                }
-            }
-            
-            // If not explicitly watched, do other updates
-            let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());            
-            match extension {
-                Some(ext) if ext == "js" => {
-                    reload_script_env = true;
-                },
-                _ => {},
-            }
-        }
-               
-        if reload_script_env {
-            let root_path = self.root_path.lock().unwrap().clone();
-            match JsEnv::new(&root_path, &self.watches) {
-                Ok(mut script_env) => match script_env.call_init() {
-                    Ok(_) => {
-                        self.script_env = script_env;
-                        self.draw_offset_stack.clear();
-                        self.draw_offset = (0., 0.).into();
-                        println!("Reloaded script environment.");
-                    },
-                    Err(err) => { dbg!(&err); },
-                },
-                Err(err) => { dbg!(&err); },
-            }
-        }
+             
+        self.script_env.handle_file_changes();
         
         // Call script draw function
         if let Err(err) = self.script_env.call_draw(dt) {
@@ -109,6 +57,9 @@ impl WindowHandler<String> for SignWindowHandler {
         }
 
         // Perform queued graphic calls
+        self.draw_offset_stack.clear();
+        self.draw_offset = (0., 0.).into();
+        
         for call in self.script_env.graphics_calls().clone().borrow().iter() {
             match call {
                 GraphicsCalls::ClearScreenBlack => {
@@ -190,33 +141,7 @@ impl SignWindowHandler {
     }
     
     pub fn new<P: AsRef<Path>>(app_root: P) -> Self {       
-        let (tx, rx) = mpsc::channel();
-        let tx_for_watcher = tx.clone();
-        
-        let mut watcher = notify::recommended_watcher(move |res: Result<notify::Event, notify::Error>| {
-            match res {
-                Ok(event) => match event.kind {
-                    notify::EventKind::Modify(_) => {
-                      for path_buf in event.paths {
-                          let cwd = std::env::current_dir().unwrap();
-                          let path = path_buf.strip_prefix(&cwd).unwrap();
-                          let _ = tx_for_watcher.send(path.to_owned());
-                      }
-                    },
-                    _ => (),
-                },
-                Err(err) => println!("Watch error: {:?}", err),
-            }
-        }).unwrap();
-         
-        watcher.watch(app_root.as_ref(), RecursiveMode::Recursive).unwrap();
-             
-        let watches = Rc::new(RefCell::new(HashMap::new()));
-
-        let mut script_env = JsEnv::new(app_root.as_ref(), &watches).unwrap_or_else(|err| {
-            dbg!(err);
-            JsEnv::new_fallback()
-        });
+        let mut script_env = JsEnv::new(app_root.as_ref());
         if let Err(err) = script_env.call_init() {
             dbg!(err);
         }             
@@ -230,10 +155,6 @@ impl SignWindowHandler {
             draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
-            watches,
-            watcher: Box::new(watcher),
-            _file_change_tx: tx,
-            file_change_rx: rx,
         }
     }
     

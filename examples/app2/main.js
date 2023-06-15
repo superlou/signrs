@@ -67,7 +67,7 @@ let i = 0;
 
 export function draw(dt) {
     let now = new Date();
-    
+
     if (debug.forceNow) {
         debug.now.setMilliseconds(debug.now.getMilliseconds() + 1000 * dt);
         now = debug.now;
@@ -78,9 +78,8 @@ export function draw(dt) {
         runningSlide.setItems(guide.running(now));
     }
     i %= 180;
-    
+
     clear_screen(color.background);
-    
     draw_image(background, 0, 0, 960, 647, 0.2);
     
     slideManager.draw(dt, font, color);

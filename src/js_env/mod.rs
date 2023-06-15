@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs::read_to_string;
+use std::sync::mpsc;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
@@ -13,15 +14,24 @@ use boa_engine::property::{Attribute, PropertyKey};
 use boa_engine::value::TryFromJs;
 use boa_runtime::Console;
 use local_ip_address::local_ip;
+use notify::{Watcher, RecursiveMode};
 
 mod graphics;
 mod files;
 pub use graphics::GraphicsCalls;
 
 pub struct JsEnv {
+    app_path: PathBuf,
     context: Context<'static>,
     module: Module,
     graphics_calls: Rc<RefCell<Vec<GraphicsCalls>>>,
+    
+    #[allow(deprecated)]
+    watches: Rc<RefCell<HashMap<PathBuf, JsFunction>>>,
+    #[allow(dead_code)] // Required to keep watcher in scope
+    watcher: Box<dyn Watcher>,
+    file_change_rx: mpsc::Receiver<PathBuf>,
+    _file_change_tx: mpsc::Sender<PathBuf>,
 }
 
 const FALLBACK_SCRIPT: &str = r###"
@@ -33,24 +43,55 @@ const FALLBACK_SCRIPT: &str = r###"
 "###;
 
 impl JsEnv {
-    pub fn new(
-        app_path: &Path,
-        watches: &Rc<RefCell<HashMap<PathBuf, JsFunction>>>) -> JsResult<Self>
+    pub fn new(app_path: &Path) -> Self
     {
-        let graphics_calls = Rc::new(RefCell::new(vec![]));
-        let (context, module) = JsEnv::create_context(app_path, &graphics_calls, watches)?;
+        let (tx, rx) = mpsc::channel();
+        let tx_for_watcher = tx.clone();
         
-        Ok(JsEnv {
+        let mut watcher = notify::recommended_watcher(move |res: Result<notify::Event, notify::Error>| {
+            match res {
+                Ok(event) => match event.kind {
+                    notify::EventKind::Modify(_) => {
+                      for path_buf in event.paths {
+                          let cwd = std::env::current_dir().unwrap();
+                          let path = path_buf.strip_prefix(&cwd).unwrap();
+                          let _ = tx_for_watcher.send(path.to_owned());
+                      }
+                    },
+                    _ => (),
+                },
+                Err(err) => println!("Watch error: {:?}", err),
+            }
+        }).unwrap();
+         
+        watcher.watch(app_path.as_ref(), RecursiveMode::Recursive).unwrap();
+             
+        let watches = Rc::new(RefCell::new(HashMap::new()));
+        
+        let graphics_calls = Rc::new(RefCell::new(vec![]));
+        let (context, module) = JsEnv::create_context(app_path, &graphics_calls, &watches)
+            .unwrap_or_else(|err| {
+                dbg!(err);
+                JsEnv::create_fallback_context(&graphics_calls)
+            }
+        );
+        
+        JsEnv {
+            app_path: app_path.to_owned(),
             context,
             module,
             graphics_calls,
-        })
+            watches,
+            watcher: Box::new(watcher),
+            _file_change_tx: tx,
+            file_change_rx: rx,
+        }
     }
     
-    /// Create a simple JsEnv that should never fail
-    pub fn new_fallback() -> Self
+    /// Create a simple context and module that should never fail
+    pub fn create_fallback_context(graphics_calls: &Rc<RefCell<Vec<GraphicsCalls>>>)
+        -> (Context<'static>, Module)
     {
-        let graphics_calls = Rc::new(RefCell::new(vec![]));
         let mut context = Context::default();
         graphics::register_fns_and_types(&mut context, &graphics_calls);
         let source = Source::from_bytes(FALLBACK_SCRIPT);
@@ -65,11 +106,7 @@ impl JsEnv {
             println!("Success");
         }        
         
-        JsEnv {
-            context,
-            module,
-            graphics_calls,
-        }
+        (context, module)
     }
     
     pub fn graphics_calls(&self) -> &Rc<RefCell<Vec<GraphicsCalls>>> {
@@ -78,10 +115,6 @@ impl JsEnv {
     
     pub fn clear_graphics_calls(&self) {
         self.graphics_calls.borrow_mut().clear();
-    }
-    
-    pub fn context_mut(&mut self) -> &mut Context<'static> {
-        &mut self.context
     }
     
     pub fn create_context(
@@ -125,6 +158,7 @@ impl JsEnv {
         
         if let PromiseState::Rejected(err) = promise.state().unwrap() {
             println!("Promise error: {}", err.display());
+            return Err(JsNativeError::eval().with_message(err.display().to_string()).into());
         } else {
             println!("Success");
         }
@@ -132,16 +166,20 @@ impl JsEnv {
         Ok((context, module))
     }
     
-    pub fn call_init(&mut self) -> Result<(), JsError> {       
-        let namespace = self.module.namespace(&mut self.context);
+    pub fn call_module_init(module: &Module, context: &mut Context) -> Result<(), JsError> {
+        let namespace = module.namespace(context);
         let init = namespace
-            .get("init", &mut self.context)?
+            .get("init", context)?
             .as_callable()
             .cloned()
             .ok_or_else(|| JsNativeError::typ().with_message("main.js must export init function!"))?;
         
-        init.call(&boa_engine::JsValue::Null, &[], &mut self.context)?;
-        Ok(())
+        init.call(&boa_engine::JsValue::Null, &[], context)?;
+        Ok(())        
+    }
+    
+    pub fn call_init(&mut self) -> Result<(), JsError> {       
+        JsEnv::call_module_init(&self.module, &mut self.context)
     }
 
     pub fn call_draw(&mut self, dt: f32) -> Result<(), JsError> {
