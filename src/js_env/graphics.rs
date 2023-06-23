@@ -71,15 +71,6 @@ impl From<JsColor> for Color {
     }
 }
 
-#[derive(Trace, Finalize, Clone)]
-struct JsFont {
-    #[unsafe_ignore_trace]
-    font: Font,
-    #[unsafe_ignore_trace]
-    cache: HashMap<BlockCacheKey, Rc<FormattedTextBlock>>,
-    test: i32,
-}
-
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 struct BlockCacheKey {
     text: String,
@@ -95,6 +86,47 @@ impl BlockCacheKey {
     }
 }
 
+#[derive(Clone)]
+struct FormattedTextBlockCache {
+    cache: HashMap<BlockCacheKey, Rc<FormattedTextBlock>>,
+}
+
+impl FormattedTextBlockCache {
+    fn new() -> Self {
+        Self {
+            cache: HashMap::new(),
+        }
+    }
+    
+    fn len(&self) -> usize {
+        self.cache.len()
+    }
+    
+    fn get(&mut self, text: &str, font: &Font, scale: f32) -> Rc<FormattedTextBlock> {
+        // todo Cold cache items should be pruned eventually
+        let key = BlockCacheKey::new(text, scale);
+        
+        match self.cache.get(&key) {
+            Some(block) => block.clone(),
+            None => {
+                let block = font.layout_text(text, scale, TextOptions::new());
+                self.cache.insert(key, block.clone());
+                block
+            }
+        }
+    }
+}
+
+#[derive(Trace, Finalize, Clone)]
+struct JsFont {
+    #[unsafe_ignore_trace]
+    font: Font,
+    #[unsafe_ignore_trace]
+    cache: FormattedTextBlockCache,
+    test: i32,
+    path: String,
+}
+
 impl Class for JsFont {
     const NAME: &'static str = "Font";
     const LENGTH: usize = 1;
@@ -105,13 +137,13 @@ impl Class for JsFont {
             &context.global_object().get("app_path", context).unwrap().try_js_into::<String>(context).unwrap()
         ).unwrap();
         
-        full_path.push(font_path);
+        full_path.push(font_path.clone());
         
         let bytes = std::fs::read(full_path).unwrap();
         let font = Font::new(&bytes).unwrap();
-        let cache = HashMap::new();        
+        let cache = FormattedTextBlockCache::new();        
         
-        Ok(JsFont{font, cache, test: 10})
+        Ok(JsFont{font, cache, test: 10, path: font_path.to_owned()})
     }
     
     fn init(class: &mut ClassBuilder) -> JsResult<()> {
@@ -121,18 +153,8 @@ impl Class for JsFont {
 }
 
 impl JsFont {   
-    // todo Cold cache items should be pruned eventually
     fn layout_text(&mut self, text: &str, scale: f32) -> Rc<FormattedTextBlock> {
-        let key = BlockCacheKey::new(text, scale);
-                               
-        match self.cache.get(&key) {
-            Some(block) => block.clone(),
-            None => {
-                let block = self.font.layout_text(text, scale, TextOptions::new());
-                self.cache.insert(key, block.clone());
-                block
-            }
-        }
+        self.cache.get(text, &self.font, scale)
     }
     
     fn cache_length(this: &JsValue, _: &[JsValue], _: &mut Context<'_>) -> JsResult<JsValue> {
