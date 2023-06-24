@@ -24,8 +24,28 @@ pub enum GraphicsCalls {
     DrawImage(Vec2, String),
     DrawRectangleImageTinted(Rectangle, String, Color),
     PushOffset(Vec2),
-    PopOffset(),
+    PopOffset,
     SetResolution(UVec2),
+}
+
+use std::fmt;
+
+impl fmt::Debug for GraphicsCalls {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use GraphicsCalls::*;
+        match self {
+            ClearScreenBlack => write!(f, "ClearScreenBlack"),
+            ClearScreen(_) => write!(f, "ClearScreenColor"),
+            DrawRectangle(_, _) => write!(f, "DrawRectangle"),
+            DrawText(_, _, _) => write!(f, "DrawText"),
+            DrawImage(_, _) => write!(f, "DrawImage"),
+            DrawRectangleImageTinted(_, _, _) => write!(f, "DrawRectangleImageTinted"),
+            PushOffset(_) => write!(f, "PushOffset"),
+            PopOffset => write!(f, "PopOffset"),
+            SetResolution(_) => write!(f, "SetResolution"),
+            _ => write!(f, "(unknown)")
+        }
+    }
 }
 
 #[derive(Debug, Trace, Finalize, TryFromJs, Clone)]
@@ -444,7 +464,7 @@ fn with_offset(
     );
 
     let call_result = func.call(this, args, context);
-    graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset());
+    graphics_calls.borrow_mut().push(GraphicsCalls::PopOffset);
     call_result
 }
 

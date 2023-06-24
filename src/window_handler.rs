@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use std::time::{Instant, Duration};
 
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
@@ -88,7 +88,7 @@ impl WindowHandler<String> for SignWindowHandler {
                     self.draw_offset += *vec2;
                     self.draw_offset_stack.push(*vec2);
                 }
-                GraphicsCalls::PopOffset() => {
+                GraphicsCalls::PopOffset => {
                     self.draw_offset -= self.draw_offset_stack.pop().unwrap_or(Vec2::ZERO);
                 },
                 GraphicsCalls::SetResolution(uvec2) => {
@@ -144,8 +144,37 @@ impl SignWindowHandler {
         let mut script_env = JsEnv::new(app_root.as_ref());
         if let Err(err) = script_env.call_init() {
             dbg!(err);
-        }             
-                     
+        }
+        
+        let mut arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>> = Arc::new(RwLock::new(vec![]));
+        let mut arc_graphics_calls_ = arc_graphics_calls.clone();
+        let app_root_ = app_root.as_ref().to_owned();
+        std::thread::spawn(move || {
+            let mut script_env = JsEnv::new(&app_root_);
+            if let Err(err) = script_env.call_init() {
+                dbg!(err);
+            }
+            
+            loop {
+                script_env.handle_file_changes();
+                if let Err(err) = script_env.call_draw(1. / 60.) {
+                    dbg!(err);
+                }
+                
+                let graphics_calls = script_env.graphics_calls();
+                let mut arcgc = arc_graphics_calls_.write().unwrap();
+                arcgc.append(&mut graphics_calls.borrow_mut());
+                script_env.clear_graphics_calls()
+            } 
+        });
+        
+        std::thread::sleep(Duration::from_millis(100));
+        dbg!(arc_graphics_calls.read().unwrap().len());
+        std::thread::sleep(Duration::from_millis(100));
+        dbg!(arc_graphics_calls.read().unwrap().len());
+        std::thread::sleep(Duration::from_millis(100));
+        dbg!(arc_graphics_calls.read().unwrap());                                      
+                                        
         SignWindowHandler {
             script_env,
             last_frame_time: Instant::now(),
