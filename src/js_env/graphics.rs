@@ -20,7 +20,7 @@ pub enum GraphicsCalls {
     ClearScreenBlack,
     ClearScreen(Color),
     DrawRectangle(Rectangle, Color),
-    DrawText(Vec2, Color, Rc<FormattedTextBlock>),
+    DrawText(Vec2, Color, FormattedTextBlock),
     DrawImage(Vec2, String),
     DrawRectangleImageTinted(Rectangle, String, Color),
     PushOffset(Vec2),
@@ -76,7 +76,7 @@ struct JsFont {
     #[unsafe_ignore_trace]
     font: Font,
     #[unsafe_ignore_trace]
-    cache: HashMap<BlockCacheKey, Rc<FormattedTextBlock>>,
+    cache: HashMap<BlockCacheKey, FormattedTextBlock>,
     test: i32,
 }
 
@@ -122,7 +122,7 @@ impl Class for JsFont {
 
 impl JsFont {   
     // todo Cold cache items should be pruned eventually
-    fn layout_text(&mut self, text: &str, scale: f32) -> Rc<FormattedTextBlock> {
+    fn layout_text(&mut self, text: &str, scale: f32) -> FormattedTextBlock {
         let key = BlockCacheKey::new(text, scale);
                                
         match self.cache.get(&key) {

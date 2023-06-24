@@ -78,7 +78,7 @@ impl WindowHandler<String> for SignWindowHandler {
                     );
                 },
                 GraphicsCalls::DrawText(pos, c, block) => {
-                    graphics.draw_text(pos + self.draw_offset, *c, block)
+                    graphics.draw_text(pos + self.draw_offset, *c, block);
                 },
                 GraphicsCalls::DrawImage(pos, path_string) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
