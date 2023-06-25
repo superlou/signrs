@@ -4,7 +4,8 @@ use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::Sender;
-use std::sync::{Arc, Mutex, RwLock, mpsc};
+use std::sync::{Arc, Mutex, RwLock, mpsc, atomic};
+use std::thread;
 use std::time::{Instant, Duration};
 
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
@@ -57,8 +58,8 @@ impl WindowHandler<String> for SignWindowHandler {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
 
+        // Wait for graphics_calls access when the JsEnv thread finishes
         let graphics_calls = self.graphics_calls.read().unwrap().clone();
-        self.graphics_calls.write().unwrap().clear();
         self.js_thread_tx.send(JsThreadMsg::RunFrame(dt)).unwrap();        
         
         // Perform queued graphic calls
@@ -154,13 +155,13 @@ impl SignWindowHandler {
         let app_root_ = app_root.as_ref().to_owned();
         let js_ready = Arc::new(AtomicBool::new(false));
         let js_ready_ = js_ready.clone();
-        std::thread::spawn(move || {
+        thread::spawn(move || {
             let mut script_env = JsEnv::new(&app_root_);
             if let Err(err) = script_env.call_init() {
                 dbg!(err);
             }
             
-            js_ready_.store(true, std::sync::atomic::Ordering::SeqCst);
+            js_ready_.store(true, atomic::Ordering::SeqCst);
             
             loop {
                 match js_thread_rx.recv().expect("No remaining senders!") {
@@ -174,6 +175,7 @@ impl SignWindowHandler {
                         }
                         
                         let graphics_calls = script_env.graphics_calls();
+                        arcgc.clear();
                         arcgc.append(&mut graphics_calls.borrow_mut());
                         script_env.clear_graphics_calls()
                     },
@@ -183,8 +185,8 @@ impl SignWindowHandler {
         });
         
         print!("Waiting for JS environment to start...");
-        while !js_ready.load(std::sync::atomic::Ordering::SeqCst) {
-            std::thread::sleep(Duration::from_millis(10));
+        while !js_ready.load(atomic::Ordering::SeqCst) {
+            thread::sleep(Duration::from_millis(10));
         }
         println!("done.");
 
