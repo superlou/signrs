@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, Mutex, RwLock, mpsc};
 use std::time::{Instant, Duration};
 
 use speedy2d::image::{ImageHandle, ImageSmoothingMode};
@@ -131,6 +131,10 @@ impl WindowHandler<String> for SignWindowHandler {
     }
 }
 
+enum JsThreadMsg {
+    RunFrame,
+}
+
 impl SignWindowHandler {
     fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<String>) {
         if *self.is_fullscreen.lock().unwrap() {
@@ -146,6 +150,7 @@ impl SignWindowHandler {
             dbg!(err);
         }
         
+        let (js_thread_tx, js_thread_rx) = mpsc::channel();
         let mut arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>> = Arc::new(RwLock::new(vec![]));
         let mut arc_graphics_calls_ = arc_graphics_calls.clone();
         let app_root_ = app_root.as_ref().to_owned();
@@ -156,24 +161,30 @@ impl SignWindowHandler {
             }
             
             loop {
-                script_env.handle_file_changes();
-                if let Err(err) = script_env.call_draw(1. / 60.) {
-                    dbg!(err);
+                match js_thread_rx.recv().unwrap() {
+                    JsThreadMsg::RunFrame => {
+                        script_env.handle_file_changes();
+                        if let Err(err) = script_env.call_draw(1. / 60.) {
+                            dbg!(err);
+                        }
+                        
+                        let graphics_calls = script_env.graphics_calls();
+                        let mut arcgc = arc_graphics_calls_.write().unwrap();
+                        arcgc.append(&mut graphics_calls.borrow_mut());
+                        script_env.clear_graphics_calls()
+                    }
                 }
-                
-                let graphics_calls = script_env.graphics_calls();
-                let mut arcgc = arc_graphics_calls_.write().unwrap();
-                arcgc.append(&mut graphics_calls.borrow_mut());
-                script_env.clear_graphics_calls()
             } 
         });
         
+        std::thread::sleep(Duration::from_millis(1000));
+        dbg!(arc_graphics_calls.read().unwrap().len());
+        js_thread_tx.send(JsThreadMsg::RunFrame);
         std::thread::sleep(Duration::from_millis(100));
         dbg!(arc_graphics_calls.read().unwrap().len());
+        js_thread_tx.send(JsThreadMsg::RunFrame);
         std::thread::sleep(Duration::from_millis(100));
-        dbg!(arc_graphics_calls.read().unwrap().len());
-        std::thread::sleep(Duration::from_millis(100));
-        dbg!(arc_graphics_calls.read().unwrap());                                      
+        dbg!(arc_graphics_calls.read().unwrap().len());               
                                         
         SignWindowHandler {
             script_env,
