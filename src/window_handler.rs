@@ -27,6 +27,7 @@ enum SignError {
 
 enum JsThreadMsg {
     RunFrame(f32),
+    TerminateThread,
 }
 
 // #[derive(Clone)]
@@ -131,6 +132,12 @@ impl WindowHandler<String> for SignWindowHandler {
     }
 }
 
+impl Drop for SignWindowHandler {
+    fn drop(&mut self) {
+        self.js_thread_tx.send(JsThreadMsg::TerminateThread).unwrap();
+    }
+}
+
 impl SignWindowHandler {
     fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<String>) {
         if *self.is_fullscreen.lock().unwrap() {
@@ -169,7 +176,8 @@ impl SignWindowHandler {
                         let graphics_calls = script_env.graphics_calls();
                         arcgc.append(&mut graphics_calls.borrow_mut());
                         script_env.clear_graphics_calls()
-                    }
+                    },
+                    JsThreadMsg::TerminateThread => return,
                 }
             } 
         });
