@@ -2,6 +2,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
+use std::sync::atomic::AtomicBool;
+use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex, RwLock, mpsc};
 use std::time::{Instant, Duration};
 
@@ -23,13 +25,18 @@ enum SignError {
     // EvalAltError(#[from] ScriptError),
 }
 
+enum JsThreadMsg {
+    RunFrame(f32),
+}
+
 // #[derive(Clone)]
 // enum UserEvents {
 //     Index,
 // }
 
 pub struct SignWindowHandler {
-    script_env: JsEnv,
+    graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>>,
+    js_thread_tx: Sender<JsThreadMsg>,
     last_frame_time: Instant,
     last_mouse_down_time: Option<Instant>,
     pub is_fullscreen: Arc<Mutex<bool>>,
@@ -48,19 +55,16 @@ impl WindowHandler<String> for SignWindowHandler {
     fn on_draw(&mut self, helper: &mut WindowHelper<String>, graphics: &mut Graphics2D) {
         let dt = self.last_frame_time.elapsed().as_secs_f32();
         self.last_frame_time = Instant::now();
-             
-        self.script_env.handle_file_changes();
-        
-        // Call script draw function
-        if let Err(err) = self.script_env.call_draw(dt) {
-            println!("{}", err);
-        }
 
+        let graphics_calls = self.graphics_calls.read().unwrap().clone();
+        self.graphics_calls.write().unwrap().clear();
+        self.js_thread_tx.send(JsThreadMsg::RunFrame(dt)).unwrap();        
+        
         // Perform queued graphic calls
         self.draw_offset_stack.clear();
         self.draw_offset = (0., 0.).into();
         
-        for call in self.script_env.graphics_calls().clone().borrow().iter() {
+        for call in graphics_calls.iter() {
             match call {
                 GraphicsCalls::ClearScreenBlack => {
                   graphics.clear_screen(Color::BLACK);  
@@ -97,11 +101,7 @@ impl WindowHandler<String> for SignWindowHandler {
                 }
             }
         }
-        
-        // Clear graphics calls only once we've handled them, including calls from
-        // initialization.
-        self.script_env.clear_graphics_calls();  
-        
+
         helper.request_redraw();
     }
     
@@ -131,10 +131,6 @@ impl WindowHandler<String> for SignWindowHandler {
     }
 }
 
-enum JsThreadMsg {
-    RunFrame,
-}
-
 impl SignWindowHandler {
     fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<String>) {
         if *self.is_fullscreen.lock().unwrap() {
@@ -145,31 +141,32 @@ impl SignWindowHandler {
     }
     
     pub fn new<P: AsRef<Path>>(app_root: P) -> Self {       
-        let mut script_env = JsEnv::new(app_root.as_ref());
-        if let Err(err) = script_env.call_init() {
-            dbg!(err);
-        }
-        
         let (js_thread_tx, js_thread_rx) = mpsc::channel();
-        let mut arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>> = Arc::new(RwLock::new(vec![]));
-        let mut arc_graphics_calls_ = arc_graphics_calls.clone();
+        let arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>> = Arc::new(RwLock::new(vec![]));
+        let arc_graphics_calls_ = arc_graphics_calls.clone();
         let app_root_ = app_root.as_ref().to_owned();
+        let js_ready = Arc::new(AtomicBool::new(false));
+        let js_ready_ = js_ready.clone();
         std::thread::spawn(move || {
             let mut script_env = JsEnv::new(&app_root_);
             if let Err(err) = script_env.call_init() {
                 dbg!(err);
             }
             
+            js_ready_.store(true, std::sync::atomic::Ordering::SeqCst);
+            
             loop {
-                match js_thread_rx.recv().unwrap() {
-                    JsThreadMsg::RunFrame => {
+                match js_thread_rx.recv().expect("No remaining senders!") {
+                    JsThreadMsg::RunFrame(dt) => {
+                        // Immediately hold the RwLock so the drawing thread has to wait
+                        let mut arcgc = arc_graphics_calls_.write().unwrap();
+
                         script_env.handle_file_changes();
-                        if let Err(err) = script_env.call_draw(1. / 60.) {
+                        if let Err(err) = script_env.call_draw(dt) {
                             dbg!(err);
                         }
                         
                         let graphics_calls = script_env.graphics_calls();
-                        let mut arcgc = arc_graphics_calls_.write().unwrap();
                         arcgc.append(&mut graphics_calls.borrow_mut());
                         script_env.clear_graphics_calls()
                     }
@@ -177,17 +174,15 @@ impl SignWindowHandler {
             } 
         });
         
-        std::thread::sleep(Duration::from_millis(1000));
-        dbg!(arc_graphics_calls.read().unwrap().len());
-        js_thread_tx.send(JsThreadMsg::RunFrame);
-        std::thread::sleep(Duration::from_millis(100));
-        dbg!(arc_graphics_calls.read().unwrap().len());
-        js_thread_tx.send(JsThreadMsg::RunFrame);
-        std::thread::sleep(Duration::from_millis(100));
-        dbg!(arc_graphics_calls.read().unwrap().len());               
-                                        
+        print!("Waiting for JS environment to start...");
+        while !js_ready.load(std::sync::atomic::Ordering::SeqCst) {
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        println!("done.");
+
         SignWindowHandler {
-            script_env,
+            graphics_calls: arc_graphics_calls,
+            js_thread_tx,
             last_frame_time: Instant::now(),
             last_mouse_down_time: None,
             is_fullscreen: Arc::new(Mutex::new(false)),

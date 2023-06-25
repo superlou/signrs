@@ -102,9 +102,7 @@ impl JsEnv {
         if let PromiseState::Rejected(err) = promise.state().unwrap() {
             println!("Promise error: {}", err.display());
             panic!();
-        } else {
-            println!("Success");
-        }        
+        }
         
         (context, module)
     }
@@ -159,8 +157,6 @@ impl JsEnv {
         if let PromiseState::Rejected(err) = promise.state().unwrap() {
             println!("Promise error: {}", err.display());
             return Err(JsNativeError::eval().with_message(err.display().to_string()).into());
-        } else {
-            println!("Success");
         }
         
         Ok((context, module))

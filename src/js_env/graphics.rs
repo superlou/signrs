@@ -16,6 +16,7 @@ use speedy2d::dimen::{Vec2, UVec2};
 use speedy2d::shape::Rectangle;
 use speedy2d::font::{Font, TextOptions, TextLayout, FormattedTextBlock};
 
+#[derive(Clone)]
 pub enum GraphicsCalls {
     ClearScreenBlack,
     ClearScreen(Color),
@@ -43,7 +44,6 @@ impl fmt::Debug for GraphicsCalls {
             PushOffset(_) => write!(f, "PushOffset"),
             PopOffset => write!(f, "PopOffset"),
             SetResolution(_) => write!(f, "SetResolution"),
-            _ => write!(f, "(unknown)")
         }
     }
 }
