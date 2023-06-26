@@ -19,6 +19,7 @@ use speedy2d::dimen::Vec2;
 use thiserror::Error;
 
 use crate::js_env::{JsEnv, GraphicsCalls};
+use crate::perf::Perf;
 
 #[derive(Error, Debug)]
 enum SignError {
@@ -46,6 +47,7 @@ pub struct SignWindowHandler {
     draw_offset: Vec2,
     pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
+    draw_perf: Perf,
 }
 
 impl WindowHandler<String> for SignWindowHandler {
@@ -61,6 +63,8 @@ impl WindowHandler<String> for SignWindowHandler {
         // Wait for graphics_calls access when the JsEnv thread finishes
         let graphics_calls = self.graphics_calls.read().unwrap().clone();
         self.js_thread_tx.send(JsThreadMsg::RunFrame(dt)).unwrap();        
+        
+        self.draw_perf.start();
         
         // Perform queued graphic calls
         self.draw_offset_stack.clear();
@@ -103,6 +107,9 @@ impl WindowHandler<String> for SignWindowHandler {
                 }
             }
         }
+        
+        self.draw_perf.stop();
+        self.draw_perf.report_after(Duration::from_secs(1));
 
         helper.request_redraw();
     }
@@ -156,6 +163,8 @@ impl SignWindowHandler {
         let js_ready = Arc::new(AtomicBool::new(false));
         let js_ready_ = js_ready.clone();
         thread::spawn(move || {
+            let mut js_frame_perf = Perf::new("JS frame");
+            
             let mut script_env = JsEnv::new(&app_root_);
             if let Err(err) = script_env.call_init() {
                 dbg!(err);
@@ -166,6 +175,7 @@ impl SignWindowHandler {
             loop {
                 match js_thread_rx.recv().expect("No remaining senders!") {
                     JsThreadMsg::RunFrame(dt) => {
+                        js_frame_perf.start();
                         // Immediately hold the RwLock so the drawing thread has to wait
                         let mut arcgc = arc_graphics_calls_.write().unwrap();
 
@@ -177,7 +187,9 @@ impl SignWindowHandler {
                         let graphics_calls = script_env.graphics_calls();
                         arcgc.clear();
                         arcgc.append(&mut graphics_calls.borrow_mut());
-                        script_env.clear_graphics_calls()
+                        script_env.clear_graphics_calls();
+                        js_frame_perf.stop();
+                        js_frame_perf.report_after(Duration::from_secs(1));
                     },
                     JsThreadMsg::TerminateThread => return,
                 }
@@ -200,6 +212,7 @@ impl SignWindowHandler {
             draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
+            draw_perf: Perf::new("Graphics draw")
         }
     }
     
