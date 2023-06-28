@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::atomic::AtomicBool;
-use std::sync::mpsc::Sender;
+use std::sync::mpsc::{Sender, Receiver};
 use std::sync::{Arc, Mutex, RwLock, mpsc, atomic};
 use std::thread;
 use std::time::{Instant, Duration};
@@ -146,6 +146,45 @@ impl Drop for SignWindowHandler {
     }
 }
 
+fn js_thread(app_root: PathBuf, ready: Arc<AtomicBool>,
+    arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>>,
+    js_thread_rx: Receiver<JsThreadMsg>
+) {
+    thread::spawn(move || {
+        let mut js_frame_perf = Perf::new("JS frame");
+        
+        let mut script_env = JsEnv::new(&app_root);
+        if let Err(err) = script_env.call_init() {
+            dbg!(err);
+        }
+        
+        ready.store(true, atomic::Ordering::SeqCst);
+        
+        loop {
+            match js_thread_rx.recv().expect("No remaining senders!") {
+                JsThreadMsg::RunFrame(dt) => {
+                    js_frame_perf.start();
+                    // Immediately hold the RwLock so the drawing thread has to wait
+                    let mut arcgc = arc_graphics_calls.write().unwrap();
+    
+                    script_env.handle_file_changes();
+                    if let Err(err) = script_env.call_draw(dt) {
+                        dbg!(err);
+                    }
+                    
+                    let graphics_calls = script_env.graphics_calls();
+                    arcgc.clear();
+                    arcgc.append(&mut graphics_calls.borrow_mut());
+                    script_env.clear_graphics_calls();
+                    js_frame_perf.stop();
+                    js_frame_perf.report_after(Duration::from_secs(1));
+                },
+                JsThreadMsg::TerminateThread => return,
+            }
+        } 
+    });
+}
+
 impl SignWindowHandler {
     fn toggle_fullscreen(&mut self, helper: &mut WindowHelper<String>) {
         if *self.is_fullscreen.lock().unwrap() {
@@ -158,43 +197,14 @@ impl SignWindowHandler {
     pub fn new<P: AsRef<Path>>(app_root: P) -> Self {       
         let (js_thread_tx, js_thread_rx) = mpsc::channel();
         let arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>> = Arc::new(RwLock::new(vec![]));
-        let arc_graphics_calls_ = arc_graphics_calls.clone();
-        let app_root_ = app_root.as_ref().to_owned();
         let js_ready = Arc::new(AtomicBool::new(false));
-        let js_ready_ = js_ready.clone();
-        thread::spawn(move || {
-            let mut js_frame_perf = Perf::new("JS frame");
-            
-            let mut script_env = JsEnv::new(&app_root_);
-            if let Err(err) = script_env.call_init() {
-                dbg!(err);
-            }
-            
-            js_ready_.store(true, atomic::Ordering::SeqCst);
-            
-            loop {
-                match js_thread_rx.recv().expect("No remaining senders!") {
-                    JsThreadMsg::RunFrame(dt) => {
-                        js_frame_perf.start();
-                        // Immediately hold the RwLock so the drawing thread has to wait
-                        let mut arcgc = arc_graphics_calls_.write().unwrap();
-
-                        script_env.handle_file_changes();
-                        if let Err(err) = script_env.call_draw(dt) {
-                            dbg!(err);
-                        }
-                        
-                        let graphics_calls = script_env.graphics_calls();
-                        arcgc.clear();
-                        arcgc.append(&mut graphics_calls.borrow_mut());
-                        script_env.clear_graphics_calls();
-                        js_frame_perf.stop();
-                        js_frame_perf.report_after(Duration::from_secs(1));
-                    },
-                    JsThreadMsg::TerminateThread => return,
-                }
-            } 
-        });
+        
+        js_thread(
+            app_root.as_ref().to_owned(),
+            js_ready.clone(),
+            arc_graphics_calls.clone(),
+            js_thread_rx
+        );
         
         print!("Waiting for JS environment to start...");
         while !js_ready.load(atomic::Ordering::SeqCst) {
