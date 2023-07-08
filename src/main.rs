@@ -19,12 +19,14 @@ FLAGS:
 
 OPTIONS:
   --multisampling  Sets the multisampling level [default: 1]
+  -p, --port       Sets the server port [default: 3000]
 ";
 
 #[derive(Debug)]
 struct SignArgs {
     app_path: String,
     multisampling: u16,
+    port: u16,
 }
 
 fn parse_args() -> Result<SignArgs, pico_args::Error> {
@@ -38,6 +40,7 @@ fn parse_args() -> Result<SignArgs, pico_args::Error> {
     let args = SignArgs {
         app_path: pargs.free_from_str()?,
         multisampling: pargs.opt_value_from_str("--multisampling")?.unwrap_or(1),
+        port: pargs.opt_value_from_str(["-p", "--port"])?.unwrap_or(3000),
     };
     
     Ok(args)
@@ -53,7 +56,7 @@ fn main() {
     };
     
     let app_path = args.app_path;
-    let handler = SignWindowHandler::new(&app_path);
+    let handler = SignWindowHandler::new(&app_path, args.port);
 
     let options = WindowCreationOptions::new_windowed(WindowSize::PhysicalPixels((640, 480).into()), None)
                     .with_multisampling(args.multisampling)

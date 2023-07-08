@@ -89,12 +89,16 @@ fn make_fs_put_response(path: &Path, request: &Request) -> Response {
     Response::text(format!("Updated {} successfully.", request.url()))
 }
 
-pub fn start_server(handler: &SignWindowHandler, sender: Mutex<UserEventSender<String>>) {
+pub fn start_server(
+    handler: &SignWindowHandler,
+    sender: Mutex<UserEventSender<String>>,
+    port: u16
+) {
     let path = handler.root_path.clone();
     let is_fullscreen = handler.is_fullscreen.clone();
     
     thread::spawn(move || {          
-        rouille::start_server("127.0.0.1:3000", move |request| {         
+        rouille::start_server(("127.0.0.1", port), move |request| {         
             let response = rouille::match_assets(request, "frontend/dist");
             if response.is_success() {
                 return response;

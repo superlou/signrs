@@ -48,12 +48,13 @@ pub struct SignWindowHandler {
     pub root_path: Arc<Mutex<PathBuf>>,
     image_handles: Rc<RefCell<HashMap<String, ImageHandle>>>,
     draw_perf: Perf,
+    server_port: u16,
 }
 
 impl WindowHandler<String> for SignWindowHandler {
     fn on_start(&mut self, helper: &mut WindowHelper<String>, _info: WindowStartupInfo) {
         let sender = helper.create_user_event_sender();
-        crate::server::start_server(self, Mutex::new(sender));
+        crate::server::start_server(self, Mutex::new(sender), self.server_port);
     }
     
     fn on_draw(&mut self, helper: &mut WindowHelper<String>, graphics: &mut Graphics2D) {
@@ -194,7 +195,7 @@ impl SignWindowHandler {
         }
     }
     
-    pub fn new<P: AsRef<Path>>(app_root: P) -> Self {       
+    pub fn new<P: AsRef<Path>>(app_root: P, server_port: u16) -> Self {       
         let (js_thread_tx, js_thread_rx) = mpsc::channel();
         let arc_graphics_calls: Arc<RwLock<Vec<GraphicsCalls>>> = Arc::new(RwLock::new(vec![]));
         let js_ready = Arc::new(AtomicBool::new(false));
@@ -222,7 +223,8 @@ impl SignWindowHandler {
             draw_offset_stack: vec![],
             root_path: Arc::new(Mutex::new(app_root.as_ref().to_path_buf())),
             image_handles: Rc::new(RefCell::new(HashMap::new())),
-            draw_perf: Perf::new("Graphics draw")
+            draw_perf: Perf::new("Graphics draw"),
+            server_port,
         }
     }
     
