@@ -1,5 +1,7 @@
 use speedy2d::Window;
 use speedy2d::window::{WindowCreationOptions, WindowSize};
+use tracing::{info, Level};
+use tracing_subscriber;
 
 mod server;
 mod iter_util;
@@ -47,6 +49,8 @@ fn parse_args() -> Result<SignArgs, pico_args::Error> {
 }
 
 fn main() { 
+    tracing_subscriber::fmt::init();
+    
     let args = match parse_args() {
         Ok(v) => v,
         Err(e) => {
@@ -65,8 +69,8 @@ fn main() {
     let window: Window<String> = Window::new_with_user_events("Title", options)
         .expect("Failed to create window!");
     
-    println!("Starting {}...", &app_path);
-    println!("Multisampling: {}", args.multisampling);
+    info!("Starting {}...", &app_path);
+    info!("Multisampling: {}", args.multisampling);
     window.run_loop(handler);    
     
 }

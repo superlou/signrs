@@ -1,5 +1,7 @@
 use std::time::{Duration, Instant};
 
+use tracing::debug;
+
 pub struct Perf {
     start: Instant,
     durations: Vec<Duration>, 
@@ -47,8 +49,8 @@ impl Perf {
             .iter()
             .max().unwrap_or(&Duration::ZERO)
             .as_secs_f32();        
-                        
-        println!("{}: runs {}, mean {:.3} ms, min {:.3} ms, max {:.3} ms",
+        
+        debug!("{}: runs {}, mean {:.3} ms, min {:.3} ms, max {:.3} ms",
             self.description,
             count,
             mean * 1000.,

@@ -25,6 +25,12 @@ To see the avaialable command-line arguments run:
 
 `cargo run --release -- --help`
 
+To view more debugging information, set the logging level with the `RUST_LOG` environment variable:
+
+```
+RUST_LOG=DEBUG cargo run examples/app2
+```
+
 ## Creating an Application
 
 Every application needs to have a "main.js" file, and export an `init` and `draw` function. The minimum application looks like this:
