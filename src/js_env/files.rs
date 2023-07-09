@@ -9,6 +9,8 @@ use boa_engine::object::builtins::JsFunction;
 use crate::js_env::JsEnv;
 use crate::iter_util::iter_unique;
 
+use super::GraphicsCalls;
+
 pub fn register_fns_and_types(
     context: &mut Context,
     watches: &Rc<RefCell<HashMap<PathBuf, JsFunction>>>
@@ -74,10 +76,18 @@ impl JsEnv {
             }
             
             // If not explicitly watched, do other updates
-            let extension = changed_path_buf.extension().and_then(|ext| ext.to_str());            
+            let extension = changed_path_buf.extension()
+                .and_then(|ext| ext.to_str())
+                .and_then(|ext| Some(ext.to_lowercase()));
+
             match extension {
                 Some(ext) if ext == "js" => {
                     reload_script_env = true;
+                },
+                Some(ext) if ["jpg", "png"].contains(&ext.as_ref()) => {
+                    self.graphics_calls.borrow_mut().push(
+                        GraphicsCalls::ImageFileUpdate(changed_path_buf)
+                    );
                 },
                 _ => {},
             }

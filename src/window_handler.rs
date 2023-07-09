@@ -105,6 +105,9 @@ impl WindowHandler<String> for SignWindowHandler {
                 GraphicsCalls::SetResolution(uvec2) => {
                     graphics.set_resolution(*uvec2);
                     helper.set_size_pixels(uvec2);
+                },
+                GraphicsCalls::ImageFileUpdate(pathbuf) => {
+                    self.update_image_handle(pathbuf, graphics)
                 }
             }
         }
@@ -240,11 +243,22 @@ impl SignWindowHandler {
                 image_handle
             }
         };
-                    
+        
+        // Need to wait until here because the match statement borrowed image_handles mutably.
         if created {
             self.image_handles.borrow_mut().insert(path_string.to_owned(), image_handle.clone());
         }
         
         image_handle
+    }
+
+    fn update_image_handle(&mut self, path: &Path, graphics: &mut Graphics2D) {
+        let image_handle = graphics.create_image_from_file_path(
+            None, ImageSmoothingMode::Linear, path
+        ).unwrap();
+        let root_path = self.root_path.lock().unwrap().clone();
+        let key = path.strip_prefix(root_path).unwrap()
+            .to_str().unwrap().to_owned();
+        self.image_handles.borrow_mut().insert(key, image_handle);
     }
 }

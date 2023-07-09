@@ -27,6 +27,7 @@ pub enum GraphicsCalls {
     PushOffset(Vec2),
     PopOffset,
     SetResolution(UVec2),
+    ImageFileUpdate(PathBuf),
 }
 
 use std::fmt;
@@ -44,6 +45,7 @@ impl fmt::Debug for GraphicsCalls {
             PushOffset(_) => write!(f, "PushOffset"),
             PopOffset => write!(f, "PopOffset"),
             SetResolution(_) => write!(f, "SetResolution"),
+            ImageFileUpdate(_) => write!(f, "ImageFileUpdate"),
         }
     }
 }
