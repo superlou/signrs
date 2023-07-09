@@ -5,7 +5,9 @@
 
 <div class="editor-container">
   <div class="panel-left">
-    <FileTree @items={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
+    <div class="sticky">
+      <FileTree @items={{this.signServer.fileList}} @selectFile={{this.editFile}}/>
+    </div>
   </div>
   <div class="content">
     {{#if this.edit}}
