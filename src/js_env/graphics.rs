@@ -163,7 +163,7 @@ impl Class for JsFont {
         let font = Font::new(&bytes).unwrap();
         let cache = FormattedTextBlockCache::new();        
         
-        Ok(JsFont{font, cache, test: 10, path: font_path.to_owned()})
+        Ok(JsFont{font, cache, test: 10, path: font_path})
     }
     
     fn init(class: &mut ClassBuilder) -> JsResult<()> {

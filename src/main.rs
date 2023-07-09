@@ -1,7 +1,6 @@
 use speedy2d::Window;
 use speedy2d::window::{WindowCreationOptions, WindowSize};
-use tracing::{info, Level};
-use tracing_subscriber;
+use tracing::info;
 
 mod server;
 mod iter_util;

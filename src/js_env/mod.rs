@@ -15,6 +15,7 @@ use boa_engine::value::TryFromJs;
 use boa_runtime::Console;
 use local_ip_address::local_ip;
 use notify::{Watcher, RecursiveMode};
+use tracing::warn;
 
 mod graphics;
 mod files;
@@ -48,19 +49,17 @@ impl JsEnv {
         let (tx, rx) = mpsc::channel();
         let tx_for_watcher = tx.clone();
         
-        let mut watcher = notify::recommended_watcher(move |res: Result<notify::Event, notify::Error>| {
+        let mut watcher = notify::recommended_watcher(move |res: Result<notify::Event, notify::Error>| {           
             match res {
-                Ok(event) => match event.kind {
-                    notify::EventKind::Modify(_) => {
-                      for path_buf in event.paths {
-                          let cwd = std::env::current_dir().unwrap();
-                          let path = path_buf.strip_prefix(&cwd).unwrap();
-                          let _ = tx_for_watcher.send(path.to_owned());
-                      }
-                    },
-                    _ => (),
+                Ok(event) if event.kind.is_modify() => {
+                    for path_buf in event.paths {
+                        let cwd = std::env::current_dir().unwrap();
+                        let path = path_buf.strip_prefix(&cwd).unwrap();
+                        let _ = tx_for_watcher.send(path.to_owned());
+                    }
                 },
-                Err(err) => println!("Watch error: {:?}", err),
+                Ok(_event) => {} // Ignore other events
+                Err(err) => warn!("Watch error: {:?}", err),
             }
         }).unwrap();
          
@@ -93,7 +92,7 @@ impl JsEnv {
         -> (Context<'static>, Module)
     {
         let mut context = Context::default();
-        graphics::register_fns_and_types(&mut context, &graphics_calls);
+        graphics::register_fns_and_types(&mut context, graphics_calls);
         let source = Source::from_bytes(FALLBACK_SCRIPT);
         let module = Module::parse(source, None, &mut context).unwrap();
         let promise = module.load_link_evaluate(&mut context).unwrap();
