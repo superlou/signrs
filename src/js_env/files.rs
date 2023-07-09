@@ -78,7 +78,7 @@ impl JsEnv {
             // If not explicitly watched, do other updates
             let extension = changed_path_buf.extension()
                 .and_then(|ext| ext.to_str())
-                .and_then(|ext| Some(ext.to_lowercase()));
+                .map(|ext| ext.to_lowercase());
 
             match extension {
                 Some(ext) if ext == "js" => {

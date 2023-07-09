@@ -231,24 +231,16 @@ impl SignWindowHandler {
         }
     }
     
-    fn get_image_handle(&mut self, path_string: &str, graphics: &mut Graphics2D) -> ImageHandle {
-        let mut created = false;
-        let image_handle = match self.image_handles.borrow_mut().get_mut(path_string) {
-            Some(image_handle) => image_handle.clone(),
-            None => {
-                let mut path = self.root_path.lock().unwrap().clone();
-                path.push(path_string);
-                let image_handle = graphics.create_image_from_file_path(None, ImageSmoothingMode::Linear, path).unwrap();
-                created = true;
-                image_handle
-            }
-        };
-        
-        // Need to wait until here because the match statement borrowed image_handles mutably.
-        if created {
-            self.image_handles.borrow_mut().insert(path_string.to_owned(), image_handle.clone());
+    fn get_image_handle(&mut self, path_string: &str, graphics: &mut Graphics2D) -> ImageHandle {               
+        if let Some(image_handle) = self.image_handles.borrow_mut().get_mut(path_string) {
+            return image_handle.clone();
         }
-        
+
+        // The path_string wasn't found in the image_handles map, so we need to create it.
+        let mut path = self.root_path.lock().unwrap().clone();
+        path.push(path_string);
+        let image_handle = graphics.create_image_from_file_path(None, ImageSmoothingMode::Linear, path).unwrap();
+        self.image_handles.borrow_mut().insert(path_string.to_owned(), image_handle.clone());
         image_handle
     }
 
