@@ -1,4 +1,4 @@
-use std::fs::read_to_string;
+use std::fs::{read_to_string, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -7,6 +7,7 @@ use std::thread;
 use rouille::{Response, router, Request};
 use serde::Serialize;
 use speedy2d::window::UserEventSender;
+use tracing::info;
 use walkdir::WalkDir;
 
 use crate::window_handler::SignWindowHandler;
@@ -89,6 +90,50 @@ fn make_fs_put_response(path: &Path, request: &Request) -> Response {
     Response::text(format!("Updated {} successfully.", request.url()))
 }
 
+fn frontend_response(request: &Request) -> Option<Response> {
+    let response = rouille::match_assets(request, "frontend/dist");
+    if response.is_success() {
+        return Some(response);
+    }
+    
+    if !request.url().starts_with("/api/") {
+        let file = File::open("frontend/dist/index.html").unwrap();
+        let response = Response::from_file("text/html", file);
+        return Some(response);
+    }
+    
+    None
+}
+
+fn fs_response(request: &Request, path: &Path) -> Option<Response> {
+    if let Some(request) = request.remove_prefix("/api/fs/") {
+        match request.method() {
+            "GET" => {
+                let mut path = path.to_owned();
+                path.push(request.url());
+                return Some(make_fs_response(&path));
+            },
+            "OPTIONS" => {
+                return Some(
+                    Response::text("OPTIONS response")
+                        .with_additional_header("Access-Control-Allow-Methods", "OPTIONS, GET, PUT")
+                );
+            },
+            "PUT" => {
+                let mut path = path.to_owned();
+                path.push(request.url());
+                return Some(make_fs_put_response(&path, &request));
+            }
+            _ => {
+                return Some(Response::text("Method not allowed")
+                    .with_status_code(405));
+            }
+        }
+    }
+    
+    None
+}
+
 pub fn start_server(
     handler: &SignWindowHandler,
     sender: Mutex<UserEventSender<String>>,
@@ -98,35 +143,15 @@ pub fn start_server(
     let is_fullscreen = handler.is_fullscreen.clone();
     
     thread::spawn(move || {          
-        rouille::start_server(("127.0.0.1", port), move |request| {         
-            let response = rouille::match_assets(request, "frontend/dist");
-            if response.is_success() {
+        rouille::start_server(("127.0.0.1", port), move |request| {
+            info!("Server request: {}", request.url());
+
+            if let Some(response) = frontend_response(request) {
                 return response;
             }
             
-            if let Some(request) = request.remove_prefix("/api/fs/") {
-                match request.method() {
-                    "GET" => {
-                        let mut path = path.lock().unwrap().to_owned();
-                        path.push(request.url());
-                        return make_fs_response(&path).allow_cors();
-                    },
-                    "OPTIONS" => {
-                        return Response::text("OPTIONS response")
-                            .with_additional_header("Access-Control-Allow-Methods", "OPTIONS, GET, PUT")
-                            .allow_cors();
-                    },
-                    "PUT" => {
-                        let mut path = path.lock().unwrap().to_owned();
-                        path.push(request.url());
-                        return make_fs_put_response(&path, &request).allow_cors();
-                    }
-                    _ => {
-                        return Response::text("Method not allowed")
-                            .with_status_code(405)
-                            .allow_cors();
-                    }
-                }
+            if let Some(response) = fs_response(request, path.lock().unwrap().as_path()) {
+                return response.allow_cors();
             }
             
             let response = router!(request, 
