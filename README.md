@@ -8,6 +8,8 @@ This project is very heavily influenced by the awesome [info-beamer](https://inf
 * The player runs on Windows, Linux, (and theoretically) macOS. Applications can be developed and tested on a desktop before being deployed to the signage hardware, e.g., a Raspberry Pi.
 * Each player runs a webserver that allows making simple changes to the running app, and provides the API to create a player management tool.
 
+https://github.com/superlou/signrs/assets/709695/9efa7d1f-9efe-4683-b5d3-db6a524a9ad2
+
 ## Key Missing Features
 
 * [ ] Choosing an open-source license
