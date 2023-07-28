@@ -73,15 +73,14 @@ impl WindowHandler<String> for SignWindowHandler {
         self.draw_offset = (0., 0.).into();
         
         for call in graphics_calls.iter() {
+            use GraphicsCalls::*;
             match call {
-                GraphicsCalls::ClearScreenBlack => {
-                  graphics.clear_screen(Color::BLACK);  
-                },
-                GraphicsCalls::ClearScreen(c) => graphics.clear_screen(*c),
-                GraphicsCalls::DrawRectangle(r, c) => {
+                ClearScreenBlack => graphics.clear_screen(Color::BLACK),
+                ClearScreen(c) => graphics.clear_screen(*c),
+                DrawRectangle(r, c) => {
                     graphics.draw_rectangle(r.with_offset(self.draw_offset), *c)
                 },
-                GraphicsCalls::DrawRectangleImageTinted(r, path_string, c) => {
+                DrawRectangleImageTinted(r, path_string, c) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
                     graphics.draw_rectangle_image_tinted(
                         r.with_offset(self.draw_offset),
@@ -89,25 +88,25 @@ impl WindowHandler<String> for SignWindowHandler {
                         &image_handle
                     );
                 },
-                GraphicsCalls::DrawText(pos, c, block) => {
+                DrawText(pos, c, block) => {
                     graphics.draw_text(pos + self.draw_offset, *c, block);
                 },
-                GraphicsCalls::DrawImage(pos, path_string) => {
+                DrawImage(pos, path_string) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
                     graphics.draw_image(pos + self.draw_offset, &image_handle);
                 },
-                GraphicsCalls::PushOffset(vec2) => {
+                PushOffset(vec2) => {
                     self.draw_offset += *vec2;
                     self.draw_offset_stack.push(*vec2);
                 }
-                GraphicsCalls::PopOffset => {
+                PopOffset => {
                     self.draw_offset -= self.draw_offset_stack.pop().unwrap_or(Vec2::ZERO);
                 },
-                GraphicsCalls::SetResolution(uvec2) => {
+                SetResolution(uvec2) => {
                     graphics.set_resolution(*uvec2);
                     helper.set_size_pixels(uvec2);
                 },
-                GraphicsCalls::ImageFileUpdate(pathbuf) => {
+                ImageFileUpdate(pathbuf) => {
                     self.update_image_handle(pathbuf, graphics)
                 }
             }
