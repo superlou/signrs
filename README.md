@@ -33,6 +33,13 @@ To view more debugging information, set the logging level with the `RUST_LOG` en
 RUST_LOG=DEBUG cargo run examples/app2
 ```
 
+To profile on Linux:
+
+```
+sudo sysctl -w kernel.perf_event_paranoid=-1
+CARGO_PROFILE_RELEASE_DEBUG=true cargo flamegraph --flamechart --no-inline -- examples/app2
+```
+
 ## Creating an Application
 
 Every application needs to have a "main.js" file, and export an `init` and `draw` function. The minimum application looks like this:
