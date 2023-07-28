@@ -62,7 +62,8 @@ impl WindowHandler<String> for SignWindowHandler {
         self.last_frame_time = Instant::now();
 
         // Wait for graphics_calls access when the JsEnv thread finishes
-        let graphics_calls = self.graphics_calls.read().unwrap().clone();
+        //let graphics_calls = self.graphics_calls.read().unwrap().clone();
+        let graphics_calls = std::mem::take(&mut *self.graphics_calls.write().unwrap());
         self.js_thread_tx.send(JsThreadMsg::RunFrame(dt)).unwrap();        
         
         self.draw_perf.start();
