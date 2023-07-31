@@ -1,7 +1,9 @@
 {{page-title "Editor"}}
 
-<LinkTo @route="index">Index</LinkTo>
-<h1>App Editor <small>{{this.signServer.appPath}}</small></h1>
+<div class="editor-menu">
+  {{this.signServer.appPath}}
+  <LinkTo @route="index">Index</LinkTo>
+</div>
 
 <div class="editor-container">
   <div class="panel-left">
