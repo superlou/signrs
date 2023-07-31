@@ -29,6 +29,7 @@ export default class SignServerService extends Service {
       let response = await fetch(this.API_ROOT + 'fs/');
       let data = await response.json();
       let items = data.items.map((item) => {
+        item.name = item.name.replaceAll('\\', '/');  // Hack for Windows
         item.name = item.name.replace(this.appPath + '/', '');
         return item;
       });
