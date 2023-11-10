@@ -16,6 +16,7 @@ use speedy2d::window::{
 use speedy2d::Graphics2D;
 use speedy2d::color::Color;
 use speedy2d::dimen::Vec2;
+use speedy2d::numeric::RoundFloat;
 use thiserror::Error;
 
 use crate::js_env::{JsEnv, GraphicsCalls};
@@ -84,7 +85,9 @@ impl WindowHandler<String> for SignWindowHandler {
                     );
                 },
                 GraphicsCalls::DrawText(pos, c, block) => {
-                    graphics.draw_text(pos + self.draw_offset, *c, block);
+                    // Rounding position avoids subpixel positions and improves performance
+                    let relative_pos = (pos + self.draw_offset).round();
+                    graphics.draw_text(relative_pos, *c, block);
                 },
                 GraphicsCalls::DrawImage(pos, path_string) => {
                     let image_handle = self.get_image_handle(path_string, graphics);
